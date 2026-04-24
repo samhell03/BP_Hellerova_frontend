@@ -1,0 +1,177 @@
+.world-map-section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  background: linear-gradient(180deg, #ffffff 0%,  100%);
+}
+
+.world-map-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.world-map-eyebrow {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.world-map-title {
+  margin: 0 0 8px;
+  font-size: 30px;
+  color: var(--text);
+}
+
+.world-map-stats {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.world-map-stat-card {
+  min-width: 150px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: white;
+}
+
+.world-map-stat-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.world-map-stat-value {
+  font-size: 28px;
+  line-height: 1;
+  color: var(--text);
+}
+
+.world-map-wrapper {
+  padding: 12px;
+  border-radius: 24px;
+}
+
+.world-map-leaflet {
+  width: 100%;
+  height: 520px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #eef4fb;
+}
+
+.world-map-placeholder {
+  display: grid;
+  place-items: center;
+  height: 520px;
+  border-radius: 18px;
+  background: #eef4fb;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.world-map-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 12px;
+  padding: 0 4px;
+}
+
+.world-map-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.legend-dot.visited {
+  background: #1db954;
+}
+
+.legend-dot.planned {
+  background: #2b5cff;
+}
+
+.legend-dot.default {
+  background: #d8e1ec;
+}
+
+.world-map-note {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+@media (max-width: 1000px) {
+  .world-map-header {
+    flex-direction: column;
+  }
+
+  .world-map-stats {
+    width: 100%;
+  }
+
+  .world-map-stat-card {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .world-map-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .world-map-section {
+    padding: 18px;
+  }
+
+  .world-map-title {
+    font-size: 24px;
+  }
+
+  .world-map-stats {
+    flex-direction: column;
+  }
+
+  .world-map-leaflet,
+  .world-map-placeholder {
+    height: 360px;
+  }
+}
+
+.world-map-leaflet svg path:focus,
+.world-map-leaflet svg path:focus-visible,
+.world-map-country-shape:focus,
+.world-map-country-shape:focus-visible {
+  outline: none !important;
+}
+
+.world-map-leaflet .leaflet-interactive:focus {
+  outline: none !important;
+}

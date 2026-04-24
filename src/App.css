@@ -1,0 +1,383 @@
+:root {
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --bg: #f8fafc;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --card: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Inter, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* ================= MENU BUTTON ================= */
+.menu-toggle {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: white;
+  border: 1px solid var(--border);
+  font-size: 22px;
+  cursor: pointer;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 200;
+}
+
+.sidebar-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.side-nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100%;
+  background: white;
+  padding: 28px 20px;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.sidebar-overlay.open .side-nav {
+  transform: translateX(0);
+}
+
+.side-nav-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.close-menu {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* ================= LOGIN FORM ================= */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login-form input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #f9fafb;
+}
+
+.form-footer {
+  text-align: center;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.form-footer span {
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* ================= NAV LINKS ================= */
+.side-nav-links a,
+.nav-item-btn {
+  display: block;
+  padding: 12px 14px;
+  border-radius: 8px;
+  color: var(--text);
+  text-decoration: none;
+  margin-bottom: 4px;
+  transition: background 0.2s;
+}
+
+.side-nav-links a.active {
+  background: var(--primary);
+  color: white;
+}
+
+.nav-item-btn {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.logout-btn {
+  color: #dc2626;
+  margin-top: 10px;
+}
+
+/* ================= HEADER ================= */
+.header {
+  background: white;
+  padding: 90px 0 70px;
+  border-bottom: 1px solid var(--border);
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.header h1 {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.hero-text {
+  color: var(--muted);
+  max-width: 560px;
+  margin-bottom: 28px;
+}
+
+/* ================= BUTTONS ================= */
+.btn-primary {
+  height: 48px;
+  padding: 0 18px;
+  overflow: hidden;
+
+  border: none;
+  border-radius: 14px;
+
+  background: var(--primary);
+  color: white;
+
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease;
+
+  box-shadow: 0 6px 16px rgba(43, 92, 255, 0.18);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* ================= CONTENT ================= */
+.content {
+  max-width: 1100px;
+  margin: 48px auto;
+  padding: 0 24px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 28px;
+  border: 1px solid var(--border);
+}
+
+.trip-list {
+  list-style: none;
+}
+
+.trip-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+}
+
+.trip-info strong {
+  font-size: 18px;
+  display: block;
+}
+
+.trip-details {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.trip-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.trip-actions button {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: white;
+  cursor: pointer;
+}
+
+.delete-btn {
+  color: #dc2626;
+}
+
+.full-width {
+  text-align: center;
+  padding: 80px 0;
+}
+
+/* ================= MODAL ================= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: 20px;
+}
+
+.modal {
+  background: white;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 480px;
+  padding: 30px;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+  position: relative;
+  /* Důležité: overflow visible, aby mohl dropdown 'vylézt' ven */
+  overflow: visible;
+}
+
+.modal h2 {
+  margin-bottom: 25px;
+  font-size: 26px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+  position: relative;
+}
+
+.form-group label {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group select {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-size: 15px;
+  background: #f9fafb;
+  width: 100%;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* Úprava pro knihovnu CountrySelect */
+.std-input {
+  border-radius: 12px !important;
+  border: 1px solid var(--border) !important;
+  background: #f9fafb !important;
+  padding: 4px !important;
+  z-index: 50;
+}
+
+.std-input ul {
+  max-height: 200px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 30px;
+  /* Zajistí, že tlačítka nebudou překryta, pokud seznam zemí nečekaně vyroste */
+  position: relative;
+  z-index: 1;
+}
+
+.btn-save {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background: #f1f5f9;
+  color: var(--text);
+  border: none;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 900px) {
+  .header {
+    padding: 60px 0;
+    text-align: center;
+  }
+  .header h1 {
+    font-size: 32px;
+  }
+}

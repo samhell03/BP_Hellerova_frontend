@@ -1,0 +1,22 @@
+:root {
+
+  /* hlavní barvy */
+  --primary: #2b5cff;
+  --primary-hover: #1f46d2;
+
+  /* pozadí */
+  --bg: #f8fafc;
+  --card-bg: #ffffff;
+
+  /* text */
+  --text: #1e293b;
+  --muted: #64748b;
+
+  /* border */
+  --border: #e5e7eb;
+
+  /* danger */
+  --danger: #dc2626;
+  --danger-bg: #ffeaea;
+
+}
