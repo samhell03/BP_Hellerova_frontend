@@ -97,6 +97,22 @@
     transform 0.15s ease;
 }
 
+.notifications-bell-item-top {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.notifications-bell-trip {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #2f66e8;
+}
+
+.notifications-bell-item.is-read {
+  opacity: 0.65;
+}
+
 .notifications-bell-item:hover {
   background: #f1f5f9;
   border-color: #dbe5f0;

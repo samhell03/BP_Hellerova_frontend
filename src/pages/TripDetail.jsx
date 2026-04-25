@@ -23,14 +23,18 @@ import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 import { formatDate, getTripStatusText } from "../utils/date";
 import CurrencyConverter from "../components/trip-detail/CurrencyConverter";
+import WeatherAlertsCard from "../components/trip-detail/WeatherAlertsCard";
 import { getCountries } from "../api/countries";
+
 import {
   deletePackage,
   generatePackageAlerts,
   getPackageWeather,
   getTripPackages,
+  importTemplatePackage,
   updatePackage
 } from "../api/packages";
+
 import {
   createNote,
   deleteNote,
@@ -433,9 +437,11 @@ function TripDetail({
 
   useEffect(() => {
     if (!trip?._id) return;
+
+    setWeatherByPackage({});
     loadPackages(trip._id);
     loadNotes(trip._id);
-  }, [trip?._id]);
+  }, [trip?._id, trip?.countryCode, trip?.city, trip?.cityLat, trip?.cityLng]);
 
   const countryNameMap = useMemo(() => buildCountryNameMap(countries), [countries]);
 
@@ -521,6 +527,21 @@ function TripDetail({
   const handleDelete = () => {
     onDeleteTrip(trip._id);
     navigate("/trips");
+  };
+
+  const handleImportNotificationsPackage = async () => {
+    if (!trip?._id) return;
+
+    try {
+      const createdPackage = await importTemplatePackage("notifications", trip._id);
+
+      await generatePackageAlerts(createdPackage._id);
+      await loadPackages(trip._id);
+
+      showSuccess("Balíček Notifikace byl přidán.");
+    } catch (err) {
+      showError(err.message || "Nepodařilo se importovat balíček Notifikace.");
+    }
   };
 
   const handleTogglePackingItem = async (packageId, itemId) => {
@@ -868,7 +889,19 @@ function TripDetail({
             </div>
           </div>
         </article>
-        <CurrencyConverter countryCode={trip.countryCode} />
+        <div className="trip-detail-currency-alerts-grid">
+          <CurrencyConverter countryCode={trip.countryCode} />
+
+          <WeatherAlertsCard
+            notificationsPackage={notificationsPackage}
+            onImport={handleImportNotificationsPackage}
+            onRemove={() => {
+              if (notificationsPackage?._id) {
+                handleDeletePackageCard(notificationsPackage._id);
+              }
+            }}
+          />
+        </div>
 
         <article className="trip-detail-panel trip-detail-weather-panel trip-detail-grid-weather">
           <div className="trip-detail-panel-head">
@@ -887,6 +920,7 @@ function TripDetail({
             <WeatherCard
               weather={weatherData}
               location={displayLocation}
+              trip={trip}
               onRemove={() => handleDeletePackageCard(weatherPackage._id)}
             />
           )}
@@ -1216,135 +1250,6 @@ function TripDetail({
             )}
           </article>
         </div>
-
-        <aside className="trip-detail-side-column">
-          <article className="trip-detail-panel">
-            <div className="trip-detail-panel-head">
-              <div>
-                <h3 className="trip-detail-section-title">Kontakty</h3>
-              </div>
-              <div className="trip-detail-panel-icon">
-                <FiPhone />
-              </div>
-            </div>
-
-            {!contactsPackage ? (
-              <p className="trip-detail-muted">
-                Pro tento výlet zatím nebyl importován balíček Kontakty.
-              </p>
-            ) : (
-              <>
-                <p className="trip-detail-muted">
-                  Důležité kontakty pro cestu. Systém předvyplní základní nouzová čísla,
-                  další kontakty si můžeš doplnit ručně.
-                </p>
-
-                <div className="trip-detail-contact-list">
-                  {(contactsPackage.contacts || []).map((contact, index) => (
-                    <div
-                      key={`${contact.label}-${index}`}
-                      className="trip-detail-contact-item"
-                      onClick={() => handleEditContact(index)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <span>{contact.label}</span>
-                      <strong>{contact.value || "Klikni pro doplnění"}</strong>
-                    </div>
-                  ))}
-                </div>
-
-                <div style={{ marginTop: 12 }}>
-                  <button
-                    className="btn-secondary"
-                    type="button"
-                    onClick={() => handleDeletePackageCard(contactsPackage._id)}
-                  >
-                    Odebrat balíček
-                  </button>
-                </div>
-              </>
-            )}
-          </article>
-
-          <article className="trip-detail-panel">
-            <div className="trip-detail-panel-head">
-              <div>
-                <h3 className="trip-detail-section-title">Notifikace</h3>
-              </div>
-            </div>
-
-            {!notificationsPackage ? (
-              <p className="trip-detail-muted">
-                Pro tento výlet zatím nebyl importován balíček Notifikace.
-              </p>
-            ) : (
-              <>
-                <p className="trip-detail-muted">
-                  Přehled upozornění odvozených z předpovědi počasí.
-                </p>
-
-                <div className="trip-detail-contact-list">
-                  {(notificationsPackage.notifications || []).length === 0 ? (
-                    <div className="trip-detail-contact-item">
-                      <span>Stav</span>
-                      <strong>Žádná aktuální upozornění</strong>
-                    </div>
-                  ) : (
-                    notificationsPackage.notifications.map((item) => (
-                      <div key={item._id} className="trip-detail-contact-item">
-                        <span>{item.title}</span>
-                        <strong>{item.message}</strong>
-                      </div>
-                    ))
-                  )}
-                </div>
-
-                <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
-                  <button
-                    className="btn-primary"
-                    type="button"
-                    onClick={async () => {
-                      try {
-                        await generatePackageAlerts(notificationsPackage._id);
-                        await loadPackages(trip._id);
-                        showSuccess("Notifikace byly aktualizovány.");
-                      } catch (err) {
-                        showError(err.message || "Nepodařilo se obnovit notifikace.");
-                      }
-                    }}
-                  >
-                    Obnovit notifikace
-                  </button>
-
-                  <button
-                    className="btn-secondary"
-                    type="button"
-                    onClick={() => handleDeletePackageCard(notificationsPackage._id)}
-                  >
-                    Odebrat balíček
-                  </button>
-                </div>
-              </>
-            )}
-          </article>
-
-          <article className="trip-detail-panel">
-            <div className="trip-detail-panel-head">
-              <div>
-                <h3 className="trip-detail-section-title">Import balíčku</h3>
-              </div>
-            </div>
-
-            <p className="trip-detail-muted">
-              Balíčky importuješ v sekci „Šablony balíčků“. Po importu se zobrazí
-              přímo zde v detailu výletu.
-            </p>
-
-            <button className="btn-primary" onClick={() => navigate("/templates")}>
-              Otevřít šablony balíčků
-            </button>
-          </article>
-        </aside>
       </section>
     </main>
   );

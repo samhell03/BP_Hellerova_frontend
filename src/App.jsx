@@ -47,6 +47,7 @@ function AppContent() {
   const [myTrips, setMyTrips] = useState([]);
   const [isPlanOpen, setIsPlanOpen] = useState(false);
   const [editingTrip, setEditingTrip] = useState(null);
+  const [tripRefreshKey, setTripRefreshKey] = useState(0);
 
   const fetchTrips = async () => {
     try {
@@ -132,7 +133,7 @@ function AppContent() {
     setEditingTrip(null);
   }, [location.pathname]);
 
-    const handleLogout = () => {
+  const handleLogout = () => {
     clearAuthData();
     setIsLoggedIn(false);
     setUserId(null);
@@ -159,7 +160,7 @@ function AppContent() {
     setEditingTrip(null);
   };
 
-    const handleDeleteTrip = async (tripId) => {
+  const handleDeleteTrip = async (tripId) => {
     const confirmed = window.confirm("Opravdu chceš tento výlet smazat?");
 
     if (!confirmed) {
@@ -177,6 +178,11 @@ function AppContent() {
   };
 
   const upcomingTrip = useMemo(() => getUpcomingTrip(myTrips), [myTrips]);
+
+  const handleAfterTripSave = async () => {
+    await fetchTrips();
+    setTripRefreshKey((prev) => prev + 1);
+  };
 
   return (
     <>
@@ -246,31 +252,31 @@ function AppContent() {
         />
 
         <Route
-        path="/statistic"
-        element={
-        <ProtectedRoute isLoggedIn={isLoggedIn} authChecked={authChecked}>
-        <StatisticsPage isLoggedIn={isLoggedIn} myTrips={myTrips} />
-        </ProtectedRoute>
-        }
+          path="/statistic"
+          element={
+            <ProtectedRoute isLoggedIn={isLoggedIn} authChecked={authChecked}>
+              <StatisticsPage isLoggedIn={isLoggedIn} myTrips={myTrips} />
+            </ProtectedRoute>
+          }
         />
 
         <Route
-  path="/shared"
-  element={
-    <ProtectedRoute isLoggedIn={isLoggedIn} authChecked={authChecked}>
-      <SharedPackagesPage />
-    </ProtectedRoute>
-  }
-/>
+          path="/shared"
+          element={
+            <ProtectedRoute isLoggedIn={isLoggedIn} authChecked={authChecked}>
+              <SharedPackagesPage />
+            </ProtectedRoute>
+          }
+        />
 
-<Route
-  path="/templates"
-  element={
-    <ProtectedRoute isLoggedIn={isLoggedIn} authChecked={authChecked}>
-      <TemplatesPage myTrips={myTrips} />
-    </ProtectedRoute>
-  }
-/>
+        <Route
+          path="/templates"
+          element={
+            <ProtectedRoute isLoggedIn={isLoggedIn} authChecked={authChecked}>
+              <TemplatesPage myTrips={myTrips} />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/profile"
@@ -286,12 +292,12 @@ function AppContent() {
         />
       </Routes>
 
-            {isPlanOpen && (
+      {isPlanOpen && (
         <NewTrip
           userId={userId}
           tripToEdit={editingTrip}
           onClose={handleCloseTripModal}
-          onSave={fetchTrips}
+          onSave={handleAfterTripSave}
         />
       )}
 

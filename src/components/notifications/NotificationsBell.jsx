@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FiBell } from "react-icons/fi";
-import { getAllNotifications, markNotificationAsRead } from "../../api/packages";
+import {
+  generateTripReminders,
+  getAllNotifications,
+  markNotificationAsRead
+} from "../../api/notifications";
 import "../../styles/notifications.css";
 
 function NotificationsBell() {
@@ -11,6 +15,8 @@ function NotificationsBell() {
   useEffect(() => {
     const loadNotifications = async () => {
       try {
+        await generateTripReminders();
+
         const data = await getAllNotifications();
         setNotifications(Array.isArray(data) ? data : []);
       } catch (err) {
@@ -48,20 +54,13 @@ function NotificationsBell() {
     [notifications]
   );
 
-  const handleMarkAsRead = async (item) => {
-    if (item.isRead) {
-      return;
-    }
 
+  const handleMarkAsRead = async (item) => {
     try {
-      await markNotificationAsRead(item.packageId, item._id);
+      await markNotificationAsRead(item._id);
 
       setNotifications((prev) =>
-        prev.map((notification) =>
-          notification._id === item._id
-            ? { ...notification, isRead: true }
-            : notification
-        )
+        prev.filter((notification) => notification._id !== item._id)
       );
     } catch (err) {
       console.error("Chyba při označení notifikace:", err);
@@ -100,13 +99,21 @@ function NotificationsBell() {
                   key={item._id}
                   type="button"
                   onClick={() => handleMarkAsRead(item)}
-                  className={`notifications-bell-item ${
-                    item.isRead ? "is-read" : ""
-                  }`}
+                  className={`notifications-bell-item ${item.isRead ? "is-read" : ""
+                    }`}
                 >
-                  <strong className="notifications-bell-item-title">
-                    {item.title}
-                  </strong>
+                  <div className="notifications-bell-item-top">
+                    <strong className="notifications-bell-item-title">
+                      {item.title}
+                    </strong>
+
+                    {item.tripTitle && (
+                      <span className="notifications-bell-trip">
+                        {item.tripTitle}
+                      </span>
+                    )}
+                  </div>
+
                   <div className="notifications-bell-item-message">
                     {item.message}
                   </div>

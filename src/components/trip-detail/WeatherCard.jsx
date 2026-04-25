@@ -107,7 +107,25 @@ function buildHourlyItemsUntilMidnight({
   return items;
 }
 
-function WeatherCard({ weather, location, onRemove }) {
+function startOfDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function getDaysUntilTripEnd(trip) {
+  if (!trip?.endDate) return 7;
+
+  const today = startOfDay(new Date());
+  const end = startOfDay(new Date(trip.endDate));
+
+  if (Number.isNaN(end.getTime())) return 7;
+
+  const diffMs = end - today;
+  const daysLeft = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  return Math.max(0, daysLeft);
+}
+
+function WeatherCard({ weather, location, trip, onRemove }) {
   if (!weather) {
     return <p className="trip-detail-muted">Načítám počasí…</p>;
   }
@@ -130,12 +148,22 @@ function WeatherCard({ weather, location, onRemove }) {
     startIndex
   });
 
-  const dailyItems = dailyTimes.slice(0, 7).map((day, i) => ({
-    day,
-    min: dailyMinTemps[i],
-    max: dailyMaxTemps[i],
-    code: dailyCodes[i]
-  }));
+  const daysUntilTripEnd = getDaysUntilTripEnd(trip);
+
+  const dailyItems = dailyTimes
+    .map((day, i) => ({
+      day,
+      min: dailyMinTemps[i],
+      max: dailyMaxTemps[i],
+      code: dailyCodes[i]
+    }))
+    .filter((item) => {
+      const date = startOfDay(new Date(item.day));
+      const today = startOfDay(new Date());
+
+      return date > today;
+    })
+    .slice(0, daysUntilTripEnd);
 
   return (
     <div className="weather-widget">

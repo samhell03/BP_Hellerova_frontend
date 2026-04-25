@@ -1247,6 +1247,20 @@
   border-left: 6px solid #8b62e8;
 }
 
+.trip-detail-currency-alerts-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.85fr);
+  gap: 18px;
+  align-items: stretch;
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 900px) {
+  .trip-detail-currency-alerts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
   .trip-note-create-options {
     flex-direction: column;
