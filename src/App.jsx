@@ -20,8 +20,8 @@ import CalendarPage from "./pages/CalendarPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import StatisticsPage from "./pages/StatisticsPage";
 import TemplatesPage from "./pages/TemplatesPage";
-import SharedPackagesPage from "./pages/SharedPackagesPage";
 import NotificationsBell from "./components/notifications/NotificationsBell";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 
 import { clearAuthData, fetchMe } from "./api/auth";
 import { getTripDetail, getTrips, removeTrip } from "./api/trips";
@@ -261,15 +261,6 @@ function AppContent() {
         />
 
         <Route
-          path="/shared"
-          element={
-            <ProtectedRoute isLoggedIn={isLoggedIn} authChecked={authChecked}>
-              <SharedPackagesPage />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
           path="/templates"
           element={
             <ProtectedRoute isLoggedIn={isLoggedIn} authChecked={authChecked}>
@@ -290,6 +281,8 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
+
+        <Route path="/ochrana-osobnich-udaju" element={<PrivacyPolicyPage />} />
       </Routes>
 
       {isPlanOpen && (

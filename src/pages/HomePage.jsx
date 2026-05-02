@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import GuestHomePage from "./GuestHomePage";
 import WorldTravelMap from "../components/home/WorldTravelMap";
 import "../styles/homepage.css";
 
@@ -157,16 +158,18 @@ function getCountdownCardContent(heroTripInfo, now) {
     return {
       label: "Konec výletu",
       value: countdown,
+      text: "Čas zbývající do konce aktuálního výletu."
     };
   }
 
   return {
     label: "Další výlet",
     value: countdown,
+    text: "Čas zbývající do začátku nejbližšího výletu."
   };
 }
 
-function HomePage({ isLoggedIn, userName, myTrips, onCreateTrip }) {
+function HomePage({ isLoggedIn, userName, myTrips = [], onCreateTrip }) {
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
@@ -177,91 +180,15 @@ function HomePage({ isLoggedIn, userName, myTrips, onCreateTrip }) {
     return () => window.clearInterval(interval);
   }, []);
 
-  const visitedCountries = new Set(
-    myTrips
-      .filter((trip) => trip.countryCode)
-      .map((trip) => trip.countryCode.toUpperCase())
-  ).size;
-
   const heroTripInfo = useMemo(() => getCurrentOrNextTrip(myTrips), [myTrips]);
+
   const countdownCard = useMemo(
     () => getCountdownCardContent(heroTripInfo, now),
     [heroTripInfo, now]
   );
 
   if (!isLoggedIn) {
-    return (
-      <main className="content">
-        <section className="card home-page home-guest-page">
-          <div className="home-guest-hero">
-            <div className="home-guest-copy">
-              <h1 className="home-guest-title">
-                Plánuj výlety přehledně, rychle a bez chaosu
-              </h1>
-              <p className="home-guest-subtitle">
-                Tato aplikace Vám pomůže ukládat cesty, sledovat navštívené země a mít
-                všechny důležité informace na jednom místě.
-              </p>
-
-              <div className="home-guest-actions">
-                <div className="home-guest-tip-card">
-                  <span className="home-guest-tip-icon"></span>
-                  <div>
-                    <strong>Začněte přihlášením v levém menu</strong>
-                    <p>
-                      Po přihlášení si můžete vytvářet výlety, zobrazit mapu
-                      procestovaných zemí a spravovat své cestovní plány.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="home-guest-preview">
-              <div className="home-preview-card home-preview-card-primary">
-                <strong className="home-preview-title">Plánování výletů</strong>
-                <p className="home-preview-text">
-                  Vytváření cest, přehled destinací a termínů.
-                </p>
-              </div>
-
-              <div className="home-preview-grid">
-                <div className="home-preview-card">
-                  <span className="home-preview-icon"></span>
-                  <strong className="home-preview-mini-title">Moje výlety</strong>
-                  <p className="home-preview-text">
-                    Přehled všech plánovaných i proběhlých cest.
-                  </p>
-                </div>
-
-                <div className="home-preview-card">
-                  <span className="home-preview-icon"></span>
-                  <strong className="home-preview-mini-title">Mapa světa</strong>
-                  <p className="home-preview-text">
-                    Vizualizace zemí, které jste již navštívil/a.
-                  </p>
-                </div>
-
-                <div className="home-preview-card">
-                  <span className="home-preview-icon"></span>
-                  <strong className="home-preview-mini-title">Termíny</strong>
-                  <p className="home-preview-text">
-                    Rychlý přehled, co Vás čeká dál.
-                  </p>
-                </div>
-
-                <div className="home-preview-card">
-                  <span className="home-preview-icon"></span>
-                  <strong className="home-preview-mini-title">Cestovní inspirace</strong>
-                  <p className="home-preview-text">
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-    );
+    return <GuestHomePage />;
   }
 
   return (
@@ -280,13 +207,12 @@ function HomePage({ isLoggedIn, userName, myTrips, onCreateTrip }) {
                   </>
                 ) : (
                   <>
-                    Vaše další dobrodružství{" "}
-                    <strong>{heroTripInfo.trip.title}</strong>{" "}
+                    Vaše další cesta <strong>{heroTripInfo.trip.title}</strong>{" "}
                     {getUpcomingTripText(heroTripInfo.trip.startDate)}.
                   </>
                 )
               ) : (
-                "Zatím nemáte naplánovaný žádný výlet."
+                "Zatím nemáte naplánovaný žádný výlet. Vytvořte si první cestu a začněte si budovat vlastní cestovní přehled."
               )}
             </p>
 
@@ -312,13 +238,13 @@ function HomePage({ isLoggedIn, userName, myTrips, onCreateTrip }) {
             </div>
           </div>
 
-          <div className="home-side-card">
+          <aside className="home-side-card">
             <span className="home-side-card-label">{countdownCard.label}</span>
             <strong className="home-side-card-value home-side-card-value-countdown">
               {countdownCard.value}
             </strong>
             <p className="home-side-card-text">{countdownCard.text}</p>
-          </div>
+          </aside>
         </div>
 
         <WorldTravelMap trips={myTrips} lazyLoad={true} />

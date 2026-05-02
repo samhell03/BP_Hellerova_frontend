@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+
 import {
   googleLoginUser,
   loginUser,
   registerUser,
   verifyRegistrationCode,
   resendRegistrationCode,
-  saveAuthData
+  saveAuthData,
+  forgotPassword,
+  resetPassword
 } from "../../api/auth";
 import { showSuccess, showError } from "../../utils/toast";
 
@@ -17,17 +20,9 @@ function getGoogleClientId() {
 function validateRegisterName(userName) {
   const trimmed = userName.trim();
 
-  if (!trimmed) {
-    return "Zadej jméno.";
-  }
-
-  if (trimmed.length < 2) {
-    return "Jméno musí mít alespoň 2 znaky.";
-  }
-
-  if (trimmed.length > 50) {
-    return "Jméno může mít maximálně 50 znaků.";
-  }
+  if (!trimmed) return "Zadej jméno.";
+  if (trimmed.length < 2) return "Jméno musí mít alespoň 2 znaky.";
+  if (trimmed.length > 50) return "Jméno může mít maximálně 50 znaků.";
 
   return "";
 }
@@ -35,35 +30,20 @@ function validateRegisterName(userName) {
 function validateEmail(email) {
   const trimmed = email.trim();
 
-  if (!trimmed) {
-    return "Zadej email.";
-  }
-
-  if (trimmed !== email) {
-    return "Email nesmí začínat ani končit mezerou.";
-  }
+  if (!trimmed) return "Zadej email.";
+  if (trimmed !== email) return "Email nesmí začínat ani končit mezerou.";
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  if (!emailRegex.test(trimmed)) {
-    return "Zadej platný email.";
-  }
+  if (!emailRegex.test(trimmed)) return "Zadej platný email.";
 
   return "";
 }
 
 function validatePassword(password) {
-  if (!password) {
-    return "Zadej heslo.";
-  }
-
-  if (password !== password.trim()) {
-    return "Heslo nesmí začínat ani končit mezerou.";
-  }
-
-  if (password.length < 6) {
-    return "Heslo musí mít alespoň 6 znaků.";
-  }
+  if (!password) return "Zadej heslo.";
+  if (password !== password.trim()) return "Heslo nesmí začínat ani končit mezerou.";
+  if (password.length < 6) return "Heslo musí mít alespoň 6 znaků.";
 
   if (!/[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]/.test(password)) {
     return "Heslo musí obsahovat alespoň jedno velké písmeno.";
@@ -124,7 +104,17 @@ function AuthForm({
   onSuccess
 }) {
   const [isRegistering, setIsRegistering] = useState(false);
-
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [forgotPasswordStep, setForgotPasswordStep] = useState("email");
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotCode, setForgotCode] = useState("");
+  const [forgotNewPassword, setForgotNewPassword] = useState("");
+  const [forgotNewPasswordConfirm, setForgotNewPasswordConfirm] = useState("");
+  const [isForgotSubmitting, setIsForgotSubmitting] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState({
+    newPassword: false,
+    confirmPassword: false
+  });
   const [pendingVerificationEmail, setPendingVerificationEmail] = useState("");
   const [registrationCode, setRegistrationCode] = useState("");
   const [isAwaitingVerification, setIsAwaitingVerification] = useState(false);
@@ -134,14 +124,16 @@ function AuthForm({
     userName: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    personalDataConsent: false
   });
 
   const [fieldErrors, setFieldErrors] = useState({
     userName: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    personalDataConsent: ""
   });
 
   const [formMessage, setFormMessage] = useState({
@@ -216,6 +208,12 @@ function AuthForm({
         }
       }
 
+      if (field === "personalDataConsent") {
+        next.personalDataConsent = value
+          ? ""
+          : "Pro registraci je nutné souhlasit se zpracováním osobních údajů.";
+      }
+
       return next;
     });
   };
@@ -225,22 +223,28 @@ function AuthForm({
     setIsAwaitingVerification(false);
     setPendingVerificationEmail("");
     setRegistrationCode("");
+
     setFormData({
       userName: "",
       email: "",
       password: "",
-      confirmPassword: ""
+      confirmPassword: "",
+      personalDataConsent: false
     });
+
     setFieldErrors({
       userName: "",
       email: "",
       password: "",
-      confirmPassword: ""
+      confirmPassword: "",
+      personalDataConsent: ""
     });
+
     setFormMessage({
       type: "",
       text: ""
     });
+
     setShowPassword({
       password: false,
       confirmPassword: false
@@ -259,7 +263,8 @@ function AuthForm({
       userName: "",
       email: "",
       password: "",
-      confirmPassword: ""
+      confirmPassword: "",
+      personalDataConsent: ""
     };
 
     nextErrors.userName = validateRegisterName(formData.userName);
@@ -274,13 +279,19 @@ function AuthForm({
       nextErrors.confirmPassword = "Hesla se neshodují.";
     }
 
+    if (!formData.personalDataConsent) {
+      nextErrors.personalDataConsent =
+        "Pro registraci je nutné souhlasit se zpracováním osobních údajů.";
+    }
+
     setFieldErrors(nextErrors);
 
     return (
       !nextErrors.userName &&
       !nextErrors.email &&
       !nextErrors.password &&
-      !nextErrors.confirmPassword
+      !nextErrors.confirmPassword &&
+      !nextErrors.personalDataConsent
     );
   };
 
@@ -289,7 +300,8 @@ function AuthForm({
       userName: "",
       email: "",
       password: "",
-      confirmPassword: ""
+      confirmPassword: "",
+      personalDataConsent: ""
     };
 
     nextErrors.email = validateEmail(formData.email);
@@ -414,10 +426,13 @@ function AuthForm({
         const data = await registerUser({
           userName: formData.userName.trim(),
           email: formData.email.trim(),
-          password: formData.password
+          password: formData.password,
+          personalDataConsent: formData.personalDataConsent
         });
 
-        setPendingVerificationEmail(data.email || formData.email.trim().toLowerCase());
+        setPendingVerificationEmail(
+          data.email || formData.email.trim().toLowerCase()
+        );
         setIsAwaitingVerification(true);
         setRegistrationCode("");
 
@@ -451,6 +466,19 @@ function AuthForm({
       const normalizedMessage = rawMessage.toLowerCase();
 
       if (isRegistering) {
+        if (
+          normalizedMessage.includes("souhlasit") ||
+          normalizedMessage.includes("osobních údajů") ||
+          normalizedMessage.includes("osobnich udaju")
+        ) {
+          setFieldErrors((prev) => ({
+            ...prev,
+            personalDataConsent: rawMessage
+          }));
+          showError(rawMessage);
+          return;
+        }
+
         if (normalizedMessage.includes("email") && normalizedMessage.includes("exist")) {
           const message = "Uživatel s tímto emailem už existuje.";
 
@@ -520,6 +548,161 @@ function AuthForm({
       showError(rawMessage);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const openForgotPassword = () => {
+    setIsForgotPasswordOpen(true);
+    setIsRegistering(false);
+    setIsAwaitingVerification(false);
+    setForgotPasswordStep("email");
+    setForgotEmail(formData.email.trim());
+    setForgotCode("");
+    setForgotNewPassword("");
+    setForgotNewPasswordConfirm("");
+    clearMessages();
+  };
+
+  const closeForgotPassword = () => {
+    setIsForgotPasswordOpen(false);
+    setForgotPasswordStep("email");
+    setForgotEmail("");
+    setForgotCode("");
+    setForgotNewPassword("");
+    setForgotNewPasswordConfirm("");
+    setShowForgotPassword({
+      newPassword: false,
+      confirmPassword: false
+    });
+    clearMessages();
+  };
+
+  const handleForgotPasswordRequest = async (e) => {
+    e.preventDefault();
+    clearMessages();
+
+    const emailError = validateEmail(forgotEmail);
+
+    if (emailError) {
+      setFormMessage({
+        type: "error",
+        text: emailError
+      });
+      showError(emailError);
+      return;
+    }
+
+    try {
+      setIsForgotSubmitting(true);
+
+      const data = await forgotPassword(forgotEmail.trim());
+
+      setFormMessage({
+        type: "success",
+        text: data.message || "Ověřovací kód byl odeslán na e-mail."
+      });
+
+      showSuccess("Ověřovací kód byl odeslán na e-mail.");
+      setForgotPasswordStep("reset");
+    } catch (err) {
+      const message = err.message || "Nepodařilo se odeslat ověřovací kód.";
+
+      setFormMessage({
+        type: "error",
+        text: message
+      });
+
+      showError(message);
+    } finally {
+      setIsForgotSubmitting(false);
+    }
+  };
+
+  const handleResetPasswordSubmit = async (e) => {
+    e.preventDefault();
+    clearMessages();
+
+    if (!forgotCode.trim()) {
+      setFormMessage({
+        type: "error",
+        text: "Zadej ověřovací kód."
+      });
+      showError("Zadej ověřovací kód.");
+      return;
+    }
+
+    if (!/^\d{6}$/.test(forgotCode.trim())) {
+      setFormMessage({
+        type: "error",
+        text: "Ověřovací kód musí mít 6 číslic."
+      });
+      showError("Ověřovací kód musí mít 6 číslic.");
+      return;
+    }
+
+    const passwordError = validatePassword(forgotNewPassword);
+
+    if (passwordError) {
+      setFormMessage({
+        type: "error",
+        text: passwordError
+      });
+      showError(passwordError);
+      return;
+    }
+
+    if (!forgotNewPasswordConfirm) {
+      setFormMessage({
+        type: "error",
+        text: "Potvrď nové heslo."
+      });
+      showError("Potvrď nové heslo.");
+      return;
+    }
+
+    if (forgotNewPassword !== forgotNewPasswordConfirm) {
+      setFormMessage({
+        type: "error",
+        text: "Hesla se neshodují."
+      });
+      showError("Hesla se neshodují.");
+      return;
+    }
+
+    try {
+      setIsForgotSubmitting(true);
+
+      const data = await resetPassword({
+        email: forgotEmail.trim(),
+        code: forgotCode.trim(),
+        newPassword: forgotNewPassword
+      });
+
+      setFormMessage({
+        type: "success",
+        text: data.message || "Heslo bylo úspěšně obnoveno."
+      });
+
+      showSuccess("Heslo bylo úspěšně obnoveno.");
+
+      setIsForgotPasswordOpen(false);
+      setForgotPasswordStep("email");
+      setFormData((prev) => ({
+        ...prev,
+        email: forgotEmail.trim(),
+        password: ""
+      }));
+    } catch (err) {
+      const message = err.message || "Nepodařilo se obnovit heslo.";
+
+      setFormMessage({
+        type: "error",
+        text: message
+      });
+
+      showError(message);
+    } finally {
+      setIsForgotSubmitting(false);
     }
   };
 
@@ -604,6 +787,163 @@ function AuthForm({
     }
   };
 
+  if (isForgotPasswordOpen) {
+    return (
+      <form
+        className="sidebar-auth-form"
+        onSubmit={
+          forgotPasswordStep === "email"
+            ? handleForgotPasswordRequest
+            : handleResetPasswordSubmit
+        }
+      >
+        <h2 className="sidebar-form-title">Obnova hesla</h2>
+
+        {formMessage.text && (
+          <div className={`sidebar-form-message ${formMessage.type}`}>
+            {formMessage.text}
+          </div>
+        )}
+
+        {forgotPasswordStep === "email" ? (
+          <>
+            <p className="sidebar-password-hint" style={{ marginBottom: "1rem" }}>
+              Zadejte e-mail, pod kterým máte účet. Zašleme Vám na něj ověřovací kód pro
+              nastavení nového hesla.
+            </p>
+
+            <div className="sidebar-form-group">
+              <input
+                className="sidebar-input"
+                type="email"
+                placeholder="Váš email"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+              />
+            </div>
+
+            <button
+              className="btn-primary"
+              type="submit"
+              disabled={isForgotSubmitting}
+            >
+              {isForgotSubmitting ? "Odesílám..." : "Poslat ověřovací kód"}
+            </button>
+          </>
+        ) : (
+          <>
+            <p className="sidebar-password-hint" style={{ marginBottom: "1rem" }}>
+              Na adresu <strong>{forgotEmail}</strong> jsme poslali ověřovací kód.
+              Zadejte ho a nastavte si nové heslo.
+            </p>
+
+            <div className="sidebar-form-group">
+              <input
+                className="sidebar-input"
+                type="text"
+                placeholder="Ověřovací kód"
+                value={forgotCode}
+                onChange={(e) => setForgotCode(e.target.value)}
+                maxLength={6}
+                inputMode="numeric"
+              />
+            </div>
+
+            <div className="sidebar-form-group">
+              <div className="sidebar-password-wrapper">
+                <input
+                  className="sidebar-input"
+                  type={showForgotPassword.newPassword ? "text" : "password"}
+                  placeholder="Nové heslo"
+                  value={forgotNewPassword}
+                  onChange={(e) => setForgotNewPassword(e.target.value)}
+                />
+
+                <button
+                  className="sidebar-password-toggle"
+                  type="button"
+                  onClick={() =>
+                    setShowForgotPassword((prev) => ({
+                      ...prev,
+                      newPassword: !prev.newPassword
+                    }))
+                  }
+                  aria-label={
+                    showForgotPassword.newPassword
+                      ? "Skrýt heslo"
+                      : "Zobrazit heslo"
+                  }
+                >
+                  {showForgotPassword.newPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
+            </div>
+
+            <div className="sidebar-form-group">
+              <div className="sidebar-password-wrapper">
+                <input
+                  className="sidebar-input"
+                  type={showForgotPassword.confirmPassword ? "text" : "password"}
+                  placeholder="Potvrzení nového hesla"
+                  value={forgotNewPasswordConfirm}
+                  onChange={(e) => setForgotNewPasswordConfirm(e.target.value)}
+                />
+
+                <button
+                  className="sidebar-password-toggle"
+                  type="button"
+                  onClick={() =>
+                    setShowForgotPassword((prev) => ({
+                      ...prev,
+                      confirmPassword: !prev.confirmPassword
+                    }))
+                  }
+                  aria-label={
+                    showForgotPassword.confirmPassword
+                      ? "Skrýt heslo"
+                      : "Zobrazit heslo"
+                  }
+                >
+                  {showForgotPassword.confirmPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
+            </div>
+
+            <p className="sidebar-password-hint">
+              Heslo musí mít alespoň 6 znaků, jedno velké písmeno a číslici
+              nebo speciální znak.
+            </p>
+
+            <button
+              className="btn-primary"
+              type="submit"
+              disabled={isForgotSubmitting}
+            >
+              {isForgotSubmitting ? "Ukládám..." : "Nastavit nové heslo"}
+            </button>
+
+            <button
+              className="btn-secondary"
+              type="button"
+              onClick={handleForgotPasswordRequest}
+              disabled={isForgotSubmitting}
+              style={{ marginTop: "0.75rem" }}
+            >
+              Poslat kód znovu
+            </button>
+          </>
+        )}
+
+        <div className="sidebar-form-footer">
+          Chcete se vrátit?
+          <span className="sidebar-form-link" onClick={closeForgotPassword}>
+            {" "}Zpět na přihlášení
+          </span>
+        </div>
+      </form>
+    );
+  }
+
   if (isAwaitingVerification) {
     return (
       <form className="sidebar-auth-form" onSubmit={handleVerifyRegistrationCode}>
@@ -667,6 +1007,8 @@ function AuthForm({
       </form>
     );
   }
+
+
 
   return (
     <form className="sidebar-auth-form" onSubmit={handleSubmit}>
@@ -738,9 +1080,8 @@ function AuthForm({
                 {[1, 2, 3, 4, 5].map((bar) => (
                   <span
                     key={bar}
-                    className={`sidebar-strength-bar ${
-                      bar <= passwordStrength.score ? passwordStrength.className : ""
-                    }`}
+                    className={`sidebar-strength-bar ${bar <= passwordStrength.score ? passwordStrength.className : ""
+                      }`}
                   />
                 ))}
               </div>
@@ -786,6 +1127,37 @@ function AuthForm({
         </div>
       )}
 
+      {isRegistering && (
+        <div className="sidebar-form-group">
+          <label className="sidebar-consent">
+            <input
+              type="checkbox"
+              checked={formData.personalDataConsent}
+              onChange={(e) =>
+                handleChange("personalDataConsent", e.target.checked)
+              }
+            />
+            <span>
+              Souhlasím se{" "}
+              <a
+                href="/ochrana-osobnich-udaju"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                zpracováním osobních údajů
+              </a>.
+            </span>
+          </label>
+
+          {fieldErrors.personalDataConsent && (
+            <p className="sidebar-field-error">
+              {fieldErrors.personalDataConsent}
+            </p>
+          )}
+        </div>
+      )}
+
       <button className="btn-primary" type="submit" disabled={isSubmitting}>
         {isSubmitting
           ? "Ukládám..."
@@ -793,6 +1165,17 @@ function AuthForm({
             ? "Zaregistrovat se"
             : "Přihlásit se"}
       </button>
+
+      {!isRegistering && (
+        <button
+          type="button"
+          className="sidebar-custom-email-link"
+          onClick={openForgotPassword}
+          style={{ marginTop: "-4px" }}
+        >
+          Zapomenuté heslo?
+        </button>
+      )}
 
       {!isRegistering && (
         <>

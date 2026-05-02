@@ -106,7 +106,7 @@ function RingCard({ title, value, subtext, percent, children }) {
         <div
           className="statistics-ring"
           style={{
-            background: `conic-gradient(#2f66e8 0% ${percent}%, #e8eefb ${percent}% 100%)`
+            background: `conic-gradient(#315caa 0% ${percent}%, #e8eefb ${percent}% 100%)`
           }}
         >
           <div className="statistics-ring-inner">
@@ -452,7 +452,7 @@ function StatisticsPage({ isLoggedIn, myTrips }) {
         <section className="statistics-main-grid">
           <BarList
             title="Cestování dle měsíců"
-            items={stats.monthCounts}
+            items={stats.monthCounts.filter((item) => item.value > 0)}
             emptyText="Zatím nejsou dostupná měsíční data."
           />
 

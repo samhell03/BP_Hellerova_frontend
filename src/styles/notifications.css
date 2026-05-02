@@ -2,7 +2,7 @@
   position: fixed;
   top: 16px;
   right: 16px;
-  z-index: 300;
+  z-index: 1300;
 }
 
 .notifications-bell-trigger {
@@ -144,12 +144,21 @@
 
 @media (max-width: 768px) {
   .notifications-bell {
-    top: 16px;
-    right: 16px;
+    top: 14px;
+    right: 14px;
+    z-index: 1300;
+  }
+
+  .notifications-bell-trigger {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
   }
 
   .notifications-bell-panel {
-    width: min(320px, calc(100vw - 32px));
+    width: min(340px, calc(100vw - 28px));
     right: 0;
   }
 }
+

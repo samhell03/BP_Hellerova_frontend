@@ -13,17 +13,12 @@ const TEMPLATES = [
   {
     key: "notifications",
     title: "Notifikace",
-    description: "Upozornění na bouřky, déšť, silný vítr...",
-  },
-  {
-    key: "contacts",
-    title: "Kontakty",
-    description: "Důležité kontakty včetně tísňových linek a vlastních kontaktů.",
+    description: "Upozornění na meteorologické jevy.",
   },
   {
     key: "packing",
     title: "Zabalit",
-    description: "Seznam věcí, které si nesmíte zapomenout sbalit.",
+    description: "Seznam věcí k zabalení.",
   }
 ];
 

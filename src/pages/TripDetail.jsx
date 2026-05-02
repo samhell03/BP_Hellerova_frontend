@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import L from "leaflet";
+import html2pdf from "html2pdf.js";
 import {
   FiArrowLeft,
   FiCalendar,
@@ -47,6 +48,7 @@ import {
   buildCountryNameMap,
   getCountryDisplayName
 } from "../utils/countryNames";
+
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -510,7 +512,6 @@ function TripDetail({
   const flagUrl = getFlagUrl(trip.countryCode);
 
   const packingPackage = packages.find((item) => item.type === "packing");
-  const contactsPackage = packages.find((item) => item.type === "contacts");
   const weatherPackage = packages.find((item) => item.type === "weather");
   const notificationsPackage = packages.find((item) => item.type === "notifications");
 
@@ -604,33 +605,6 @@ function TripDetail({
     }
   };
 
-  const handleEditContact = async (index) => {
-    if (!contactsPackage) return;
-
-    const current = contactsPackage.contacts[index];
-    const value = window.prompt(
-      `Uprav kontakt "${current.label}"`,
-      current.value || ""
-    );
-
-    if (value === null) return;
-
-    const nextContacts = contactsPackage.contacts.map((contact, i) =>
-      i === index ? { ...contact, value } : contact
-    );
-
-    try {
-      const updated = await updatePackage(contactsPackage._id, {
-        contacts: nextContacts
-      });
-      setPackages((prev) =>
-        prev.map((p) => (p._id === contactsPackage._id ? updated : p))
-      );
-      showSuccess("Kontakt byl upraven.");
-    } catch (err) {
-      showError(err.message || "Nepodařilo se upravit kontakt.");
-    }
-  };
 
   const handleDeletePackageCard = async (packageId) => {
     const confirmed = window.confirm(
@@ -701,6 +675,145 @@ function TripDetail({
     }
   };
 
+  const getSafeFileName = (value) =>
+    String(value || "vylet")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+  const createPdfElement = (title, contentHtml) => {
+    const wrapper = document.createElement("div");
+
+    wrapper.innerHTML = `
+    <div style="
+      width: 720px;
+      padding: 28px;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+      color: #13203a;
+      background: #ffffff;
+      font-size: 11px;
+      line-height: 1.35;
+    ">
+      <div style="
+        border-bottom: 1px solid #e5ecf6;
+        padding-bottom: 12px;
+        margin-bottom: 18px;
+      ">
+        <h1 style="
+          margin: 0;
+          font-size: 22px;
+          line-height: 1.2;
+          color: #13203a;
+        ">
+          ${title}
+        </h1>
+        <p style="
+          margin: 6px 0 0;
+          color: #6a7891;
+          font-size: 10px;
+        ">
+          Vygenerováno: ${new Date().toLocaleDateString("cs-CZ")}
+        </p>
+      </div>
+
+      ${contentHtml}
+    </div>
+  `;
+
+    return wrapper;
+  };
+
+  const handleExportTripPdf = async () => {
+    const checklistItems = packingPackage?.packingItems || [];
+
+    const checklistRows = checklistItems
+      .map(
+        (item) => `
+      <tr>
+        <td style="border:1px solid #ddd; padding:6px; width:30px;">
+          ${item.checked ? "✓" : ""}
+        </td>
+        <td style="
+          border:1px solid #ddd;
+          padding:6px;
+          ${item.checked ? "text-decoration: line-through; color:#888;" : ""}
+        ">
+          ${item.text}
+        </td>
+      </tr>
+    `
+      )
+      .join("");
+
+    const notesHtml = notes
+      .map(
+        (note) => `
+      <div style="margin-bottom:10px;">
+        <strong>${note.title}</strong><br/>
+        <span style="color:#555;">${note.content || ""}</span>
+      </div>
+    `
+      )
+      .join("");
+
+    const content = `
+    <h2>Přehled výletu</h2>
+
+    <table style="width:100%; border-collapse:collapse; font-size:12px;">
+      ${[
+        ["Název", trip.title],
+        ["Destinace", displayLocation],
+        ["Začátek", formatDate(trip.startDate)],
+        ["Konec", formatDate(trip.endDate)],
+        ["Délka", getTripLengthLabel(tripLength)],
+        ["Kategorie", getCategoryLabel(trip.category)]
+      ]
+        .map(
+          ([l, v]) => `
+          <tr>
+            <td style="border:1px solid #ddd; padding:6px; width:30%; font-weight:bold;">
+              ${l}
+            </td>
+            <td style="border:1px solid #ddd; padding:6px;">
+              ${v}
+            </td>
+          </tr>
+        `
+        )
+        .join("")}
+    </table>
+
+    <br/>
+
+    <h2>Checklist</h2>
+
+    <table style="width:100%; border-collapse:collapse; font-size:12px;">
+      ${checklistRows || "<tr><td>Žádné položky</td></tr>"}
+    </table>
+
+    <br/>
+
+    <h2>Poznámky</h2>
+
+    ${notesHtml || "<p>Žádné poznámky</p>"}
+  `;
+
+    const element = createPdfElement(`Detail výletu – ${trip.title}`, content);
+
+    await html2pdf().set({
+      margin: 10,
+      filename: `${getSafeFileName(trip.title)}-detail.pdf`,
+      html2canvas: {
+        scale: 2,
+        useCORS: true
+      },
+      jsPDF: { unit: "mm", format: "a4" }
+    }).from(element).save();
+  };
+
   return (
     <main className="content">
       <section className={`trip-detail-hero trip-detail-hero-${statusTone}`}>
@@ -732,6 +845,16 @@ function TripDetail({
             >
               <FiTrash2 />
             </button>
+
+            <button
+              className="trip-detail-icon-button"
+              onClick={handleExportTripPdf}
+              title="Exportovat detail výletu do PDF"
+              type="button"
+            >
+              <FiFileText />
+            </button>
+
           </div>
         </div>
 

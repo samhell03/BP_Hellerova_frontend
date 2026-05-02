@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GeoJSON, MapContainer, TileLayer } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 import "../../styles/worldtravelmap.css";
 import { getCountries } from "../../api/countries";
 import { normalizeText } from "../../utils/countryNames";
@@ -195,6 +195,7 @@ const WorldTravelMap = memo(function WorldTravelMap({
   lazyLoad = true
 }) {
   const sectionRef = useRef(null);
+  const geoJsonRef = useRef(null);
   const [shouldLoadMap, setShouldLoadMap] = useState(!lazyLoad);
 
   const [worldGeoJson, setWorldGeoJson] = useState(null);
@@ -333,14 +334,21 @@ const WorldTravelMap = memo(function WorldTravelMap({
 
       layer.on({
         mouseover: (event) => {
-          event.target.setStyle(
+          const targetLayer = event.target;
+
+          targetLayer.setStyle(
             getHoverFeatureStyle(feature, visitedNames, plannedNames)
           );
+
+          if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+            targetLayer.bringToFront();
+          }
         },
+
         mouseout: (event) => {
-          event.target.setStyle(
-            getBaseFeatureStyle(feature, visitedNames, plannedNames)
-          );
+          if (geoJsonRef.current) {
+            geoJsonRef.current.resetStyle(event.target);
+          }
         }
       });
     },
@@ -405,6 +413,8 @@ const WorldTravelMap = memo(function WorldTravelMap({
             />
 
             <GeoJSON
+              ref={geoJsonRef}
+              key={`world-map-${visitedCount}-${visitedPercent}`}
               data={worldGeoJson}
               style={mapStyle}
               onEachFeature={onEachCountry}

@@ -1,6 +1,6 @@
 :root {
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
+  --primary: #315caa;
+  --primary-hover: #315caa;
   --bg: #f8fafc;
   --text: #0f172a;
   --muted: #64748b;
@@ -379,5 +379,18 @@ body {
   }
   .header h1 {
     font-size: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-page,
+  .my-trips-page,
+  .calendar-page,
+  .profile-page,
+  .statistics-page,
+  .templates-page,
+  .shared-packages-page,
+  .trip-detail-hero {
+    margin-top: 78px;
   }
 }

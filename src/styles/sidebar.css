@@ -48,6 +48,8 @@
   flex-direction: column;
   border-top-right-radius: 18px;
   border-bottom-right-radius: 18px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .sidebar-overlay.open .sidebar-panel {
@@ -60,6 +62,7 @@
   justify-content: space-between;
   margin-bottom: 24px;
   padding-top: 8px;
+  flex-shrink: 0;
 }
 
 .sidebar-title {
@@ -81,10 +84,17 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  width: 100%;
 }
 
 .sidebar-form-title {
   margin: 0 0 4px;
+}
+
+.sidebar-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
 }
 
 .sidebar-input {
@@ -105,10 +115,9 @@
   box-shadow: 0 0 0 4px rgba(47, 102, 232, 0.08);
 }
 
-.sidebar-form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
+.sidebar-input.has-error {
+  border-color: #cf3e3e;
+  box-shadow: 0 0 0 3px rgba(207, 62, 62, 0.08);
 }
 
 .sidebar-email-row {
@@ -128,7 +137,7 @@
   padding: 0;
   border: none;
   background: transparent;
-  color: #2f66e8;
+  color: #315caa;
   font-size: 0.9rem;
   font-weight: 600;
   text-align: left;
@@ -137,11 +146,6 @@
 
 .sidebar-custom-email-link:hover {
   text-decoration: underline;
-}
-
-.sidebar-input.has-error {
-  border-color: #cf3e3e;
-  box-shadow: 0 0 0 3px rgba(207, 62, 62, 0.08);
 }
 
 .sidebar-password-wrapper {
@@ -169,7 +173,7 @@
 }
 
 .sidebar-password-toggle:hover {
-  color: #2f66e8;
+  color: #315caa;
 }
 
 .sidebar-field-error {
@@ -286,7 +290,7 @@
 
 .sidebar-nav-link.active {
   background: #e8f0ff;
-  color: #2b5cff;
+  color: #315caa;
   font-weight: 600;
 }
 
@@ -344,7 +348,7 @@
   margin-bottom: 14px;
 }
 
-.sidebar-google-button > div {
+.sidebar-google-button>div {
   width: 100% !important;
   display: flex;
   justify-content: center;
@@ -355,17 +359,84 @@
   border-radius: 14px;
 }
 
+.sidebar-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: #5f6f89;
+  cursor: pointer;
+}
+
+.sidebar-consent input {
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+  accent-color: #315caa;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.sidebar-consent span {
+  flex: 1;
+}
+
+.sidebar-consent a {
+  color: #315caa;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.sidebar-consent a:hover {
+  text-decoration: underline;
+}
+
+/* MOBILE FIX */
+
 @media (max-width: 768px) {
   .sidebar-menu-toggle {
     top: 14px;
     left: 14px;
     width: 54px;
     height: 54px;
+    z-index: 1300;
   }
 
   .sidebar-panel {
-    width: 350px;
+    width: min(380px, 92vw);
+    max-width: 92vw;
+    height: 100dvh;
+    max-height: 100dvh;
     padding: 16px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .sidebar-header {
+    margin-bottom: 16px;
+    padding-top: 4px;
+  }
+
+  .sidebar-title {
+    font-size: 22px;
+  }
+
+  .sidebar-auth-form {
+    gap: 12px;
+    margin-top: 8px;
+    padding-bottom: calc(140px + env(safe-area-inset-bottom));
+  }
+
+  .sidebar-auth-form .btn-primary {
+    min-height: 50px;
+    margin-top: 8px;
+  }
+
+  .sidebar-input {
+    min-height: 46px;
+    padding: 13px 15px;
   }
 
   .sidebar-nav-link,
@@ -373,12 +444,46 @@
     font-size: 17px;
     padding: 16px 18px;
   }
+}
 
-  .sidebar-auth-form .btn-primary {
-    min-height: 50px;
+@media (max-width: 480px) {
+  .sidebar-panel {
+    width: 100vw;
+    max-width: 100vw;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .sidebar-auth-form {
+    padding-bottom: calc(170px + env(safe-area-inset-bottom));
+  }
+
+  .sidebar-form-title {
+    font-size: 1.35rem;
   }
 
   .sidebar-input {
-    padding: 14px 16px;
+    min-height: 44px;
+  }
+
+  .sidebar-email-row {
+    grid-template-columns: 1fr;
   }
 }
+
+@media (max-height: 700px) and (max-width: 768px) {
+  .sidebar-auth-form {
+    gap: 10px;
+    padding-bottom: calc(190px + env(safe-area-inset-bottom));
+  }
+
+  .sidebar-form-group {
+    gap: 5px;
+  }
+
+  .sidebar-password-hint,
+  .sidebar-password-strength {
+    margin-top: 4px;
+  }
+}
+

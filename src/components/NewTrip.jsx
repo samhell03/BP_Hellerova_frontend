@@ -36,11 +36,6 @@ const PACKAGE_OPTIONS = [
     description: "Upozornění podle počasí."
   },
   {
-    key: "contacts",
-    label: "Kontakty",
-    description: "Nouzová čísla a důležité kontakty."
-  },
-  {
     key: "packing",
     label: "Zabalit",
     description: "Checklist věcí k zabalení."
@@ -109,11 +104,11 @@ function getDefaultPackagesForCategory(category) {
     case "mountains":
       return ["weather", "notifications", "packing"];
     case "camping":
-      return ["contacts", "packing", "notifications"];
+      return ["packing", "notifications"];
     case "city":
-      return ["weather", "contacts"];
+      return ["weather"];
     case "roadtrip":
-      return ["contacts", "notifications", "packing"];
+      return ["notifications", "packing"];
     case "general":
       return ["packing"];
     case "custom":
