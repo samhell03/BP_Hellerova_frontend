@@ -39,6 +39,7 @@ function TemplatesPage({ myTrips = [] }) {
       await Promise.all(
         myTrips.map(async (trip) => {
           const packages = await getTripPackages(trip._id);
+
           result[trip._id] = Array.isArray(packages)
             ? packages.map((item) => item.type)
             : [];
@@ -100,6 +101,7 @@ function TemplatesPage({ myTrips = [] }) {
 
     try {
       setLoadingKey(tripId);
+
       await importTemplatePackage(selectedTemplate.key, tripId);
 
       setPackageTypesByTrip((prev) => ({
@@ -199,7 +201,8 @@ function TemplatesPage({ myTrips = [] }) {
                 </div>
               ) : filteredTrips.length === 0 ? (
                 <div className="template-modal-empty">
-                  Tento balíček už je ve všech odpovídajících výletech importovaný.
+                  Tento balíček už je ve všech odpovídajících výletech
+                  importovaný.
                 </div>
               ) : (
                 filteredTrips.map((trip) => {

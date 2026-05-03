@@ -357,7 +357,9 @@
     position: static;
     inset: auto;
     z-index: 3;
+    display: flex;
     opacity: 0;
+    visibility: hidden;
     max-height: 0;
     overflow: hidden;
     pointer-events: none;
@@ -372,6 +374,7 @@
   .template-card:hover .template-card-overlay,
   .template-card:focus-within .template-card-overlay {
     opacity: 0;
+    visibility: hidden;
   }
 
   .template-card.template-card--active {
@@ -380,10 +383,12 @@
   }
 
   .template-card.template-card--active .template-card-overlay {
-    opacity: 1;
-    max-height: 90px;
-    pointer-events: auto;
-    padding: 0 18px 18px;
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    max-height: 90px !important;
+    pointer-events: auto !important;
+    padding: 0 18px 18px !important;
   }
 
   .template-card.template-card--active .template-card-base {
@@ -465,7 +470,7 @@
   }
 
   .template-card.template-card--active .template-card-overlay {
-    padding: 0 16px 16px;
+    padding: 0 16px 16px !important;
   }
 
   .template-modal {
