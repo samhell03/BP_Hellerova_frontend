@@ -303,16 +303,30 @@
   line-height: 1.5;
 }
 
-/* RESPONSIVE */
 
 @media (hover: none) {
+  .template-card {
+    cursor: pointer;
+  }
+
   .template-card-overlay {
     position: static;
-    opacity: 1;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    pointer-events: none;
     background: transparent;
     backdrop-filter: none;
-    padding: 0 clamp(20px, 4vw, 28px) clamp(20px, 4vw, 28px);
+    padding: 0 clamp(20px, 4vw, 28px);
     justify-content: flex-start;
+    transition: opacity 0.2s ease, max-height 0.2s ease, padding 0.2s ease;
+  }
+
+  .template-card.template-card--active .template-card-overlay {
+    opacity: 1;
+    max-height: 80px;
+    pointer-events: auto;
+    padding: 0 clamp(20px, 4vw, 28px) clamp(20px, 4vw, 28px);
   }
 
   .template-card-overlay-button {
@@ -324,6 +338,10 @@
   }
 
   .template-card-base {
+    padding-bottom: 18px;
+  }
+
+  .template-card.template-card--active .template-card-base {
     padding-bottom: 14px;
   }
 }

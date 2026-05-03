@@ -23,9 +23,11 @@ const TEMPLATES = [
 ];
 
 function TemplatesPage({ myTrips = [] }) {
-  const [selectedTemplate, setSelectedTemplate] = useState(null);
-  const [tripSearch, setTripSearch] = useState("");
-  const [loadingKey, setLoadingKey] = useState("");
+  const handleTemplateCardClick = (template) => {
+    setActiveTemplateKey((prevKey) =>
+      prevKey === template.key ? null : template.key
+    );
+  };
 
   const filteredTrips = useMemo(() => {
     const q = tripSearch.trim().toLowerCase();
@@ -81,7 +83,12 @@ function TemplatesPage({ myTrips = [] }) {
         <div className="templates-grid">
           {TEMPLATES.map((template) => {
             return (
-              <article key={template.key} className="template-card">
+              <article
+                key={template.key}
+                className={`template-card ${activeTemplateKey === template.key ? "template-card--active" : ""
+                  }`}
+                onClick={() => handleTemplateCardClick(template)}
+              >
                 <div className="template-card-base">
                   <h3 className="template-card-title">{template.title}</h3>
                   <p className="template-card-description">{template.description}</p>
@@ -91,7 +98,10 @@ function TemplatesPage({ myTrips = [] }) {
                   <button
                     type="button"
                     className="template-card-overlay-button"
-                    onClick={() => openImportModal(template)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openImportModal(template);
+                    }}
                   >
                     Importovat
                   </button>
