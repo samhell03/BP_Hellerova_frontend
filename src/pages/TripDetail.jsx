@@ -10,7 +10,6 @@ import {
   FiEdit2,
   FiFileText,
   FiGlobe,
-  FiPhone,
   FiTrash2
 } from "react-icons/fi";
 
@@ -42,13 +41,13 @@ import {
   getNotesByTrip,
   toggleNoteChecklistItem
 } from "../api/notes";
+
 import { showError, showSuccess } from "../utils/toast";
 
 import {
   buildCountryNameMap,
   getCountryDisplayName
 } from "../utils/countryNames";
-
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -213,14 +212,20 @@ function getTripTimeZoneInfo(weather, startDate) {
   if (!weather) return null;
 
   const referenceDate = getReferenceDateForTrip(startDate);
-  const pragueOffsetMinutes = getTimeZoneOffsetMinutes("Europe/Prague", referenceDate);
+  const pragueOffsetMinutes = getTimeZoneOffsetMinutes(
+    "Europe/Prague",
+    referenceDate
+  );
 
   let destinationOffsetMinutes = null;
   let destinationZoneName = null;
 
   if (weather?.timezone) {
     destinationZoneName = weather.timezone;
-    destinationOffsetMinutes = getTimeZoneOffsetMinutes(weather.timezone, referenceDate);
+    destinationOffsetMinutes = getTimeZoneOffsetMinutes(
+      weather.timezone,
+      referenceDate
+    );
   }
 
   if (
@@ -282,6 +287,18 @@ function getFlagUrl(countryCode) {
   return `https://flagcdn.com/w160/${countryCode.toLowerCase()}.png`;
 }
 
+function MissingPackageCard({ title, text, onImport }) {
+  return (
+    <div className="trip-detail-missing-package">
+      <h4>{title}</h4>
+      <p>{text}</p>
+      <button type="button" className="btn-primary" onClick={onImport}>
+        Importovat balíček
+      </button>
+    </div>
+  );
+}
+
 function TripDetail({
   isLoggedIn,
   myTrips,
@@ -291,13 +308,6 @@ function TripDetail({
 }) {
   const { id } = useParams();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: "auto"
-    });
-  }, [id]);
 
   const tripFromList = useMemo(
     () => (myTrips || []).find((tripItem) => tripItem._id === id),
@@ -324,6 +334,13 @@ function TripDetail({
   const [newNotePinned, setNewNotePinned] = useState(false);
 
   useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "auto"
+    });
+  }, [id]);
+
+  useEffect(() => {
     setTrip(tripFromList || null);
   }, [tripFromList]);
 
@@ -334,11 +351,20 @@ function TripDetail({
 
     const loadTrip = async () => {
       setTripLoading(true);
-      const loadedTrip = await fetchTripById(id);
 
-      if (active) {
-        setTrip(loadedTrip);
-        setTripLoading(false);
+      try {
+        const loadedTrip = await fetchTripById(id);
+
+        if (active) {
+          setTrip(loadedTrip);
+        }
+      } catch (err) {
+        console.error("Chyba při načítání výletu:", err);
+        showError(err.message || "Nepodařilo se načíst výlet.");
+      } finally {
+        if (active) {
+          setTripLoading(false);
+        }
       }
     };
 
@@ -392,6 +418,7 @@ function TripDetail({
       for (const pack of weatherPackages) {
         try {
           const weather = await getPackageWeather(pack._id);
+
           setWeatherByPackage((prev) => ({
             ...prev,
             [pack._id]: weather
@@ -489,7 +516,8 @@ function TripDetail({
 
   const countryMeta = countries.find(
     (country) =>
-      (country.code || "").toUpperCase() === (trip.countryCode || "").toUpperCase()
+      (country.code || "").toUpperCase() ===
+      (trip.countryCode || "").toUpperCase()
   );
 
   const displayCountry = getCountryDisplayName(
@@ -513,13 +541,21 @@ function TripDetail({
 
   const packingPackage = packages.find((item) => item.type === "packing");
   const weatherPackage = packages.find((item) => item.type === "weather");
-  const notificationsPackage = packages.find((item) => item.type === "notifications");
+  const notificationsPackage = packages.find(
+    (item) => item.type === "notifications"
+  );
 
   const weatherData = weatherPackage ? weatherByPackage[weatherPackage._id] : null;
-  const timeZoneCard = getTimeZoneCardData(weatherPackage, weatherData, trip.startDate);
+  const timeZoneCard = getTimeZoneCardData(
+    weatherPackage,
+    weatherData,
+    trip.startDate
+  );
 
   const totalItems = packingPackage?.packingItems?.length || 0;
-  const checkedItems = (packingPackage?.packingItems || []).filter((i) => i.checked).length;
+  const checkedItems = (packingPackage?.packingItems || []).filter(
+    (i) => i.checked
+  ).length;
   const progress = totalItems ? Math.round((checkedItems / totalItems) * 100) : 0;
 
   const pinnedNotes = notes.filter((note) => note.isPinned);
@@ -530,18 +566,22 @@ function TripDetail({
     navigate("/trips");
   };
 
-  const handleImportNotificationsPackage = async () => {
+  const handleImportPackage = async (templateKey, templateTitle) => {
     if (!trip?._id) return;
 
     try {
-      const createdPackage = await importTemplatePackage("notifications", trip._id);
+      const createdPackage = await importTemplatePackage(templateKey, trip._id);
 
-      await generatePackageAlerts(createdPackage._id);
+      if (templateKey === "notifications") {
+        await generatePackageAlerts(createdPackage._id);
+      }
+
       await loadPackages(trip._id);
-
-      showSuccess("Balíček Notifikace byl přidán.");
+      showSuccess(`Balíček ${templateTitle} byl přidán.`);
     } catch (err) {
-      showError(err.message || "Nepodařilo se importovat balíček Notifikace.");
+      showError(
+        err.message || `Nepodařilo se importovat balíček ${templateTitle}.`
+      );
     }
   };
 
@@ -590,26 +630,30 @@ function TripDetail({
   const handleDeletePackingItem = async (itemId) => {
     if (!packingPackage) return;
 
-    const nextItems = packingPackage.packingItems.filter((item) => item._id !== itemId);
+    const nextItems = packingPackage.packingItems.filter(
+      (item) => item._id !== itemId
+    );
 
     try {
       const updated = await updatePackage(packingPackage._id, {
         packingItems: nextItems
       });
+
       setPackages((prev) =>
         prev.map((p) => (p._id === packingPackage._id ? updated : p))
       );
+
       showSuccess("Položka byla smazána.");
     } catch (err) {
       showError(err.message || "Nepodařilo se smazat položku.");
     }
   };
 
-
   const handleDeletePackageCard = async (packageId) => {
     const confirmed = window.confirm(
       "Opravdu chceš tento balíček odstranit z výletu?"
     );
+
     if (!confirmed) return;
 
     try {
@@ -667,6 +711,7 @@ function TripDetail({
   const handleToggleNoteChecklistItem = async (noteId, itemId) => {
     try {
       const updated = await toggleNoteChecklistItem(noteId, itemId);
+
       setNotes((prev) =>
         prev.map((note) => (note._id === noteId ? updated : note))
       );
@@ -687,41 +732,41 @@ function TripDetail({
     const wrapper = document.createElement("div");
 
     wrapper.innerHTML = `
-    <div style="
-      width: 720px;
-      padding: 28px;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-      color: #13203a;
-      background: #ffffff;
-      font-size: 11px;
-      line-height: 1.35;
-    ">
       <div style="
-        border-bottom: 1px solid #e5ecf6;
-        padding-bottom: 12px;
-        margin-bottom: 18px;
+        width: 720px;
+        padding: 28px;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+        color: #13203a;
+        background: #ffffff;
+        font-size: 11px;
+        line-height: 1.35;
       ">
-        <h1 style="
-          margin: 0;
-          font-size: 22px;
-          line-height: 1.2;
-          color: #13203a;
+        <div style="
+          border-bottom: 1px solid #e5ecf6;
+          padding-bottom: 12px;
+          margin-bottom: 18px;
         ">
-          ${title}
-        </h1>
-        <p style="
-          margin: 6px 0 0;
-          color: #6a7891;
-          font-size: 10px;
-        ">
-          Vygenerováno: ${new Date().toLocaleDateString("cs-CZ")}
-        </p>
-      </div>
+          <h1 style="
+            margin: 0;
+            font-size: 22px;
+            line-height: 1.2;
+            color: #13203a;
+          ">
+            ${title}
+          </h1>
+          <p style="
+            margin: 6px 0 0;
+            color: #6a7891;
+            font-size: 10px;
+          ">
+            Vygenerováno: ${new Date().toLocaleDateString("cs-CZ")}
+          </p>
+        </div>
 
-      ${contentHtml}
-    </div>
-  `;
+        ${contentHtml}
+      </div>
+    `;
 
     return wrapper;
   };
@@ -732,86 +777,89 @@ function TripDetail({
     const checklistRows = checklistItems
       .map(
         (item) => `
-      <tr>
-        <td style="border:1px solid #ddd; padding:6px; width:30px;">
-          ${item.checked ? "✓" : ""}
-        </td>
-        <td style="
-          border:1px solid #ddd;
-          padding:6px;
-          ${item.checked ? "text-decoration: line-through; color:#888;" : ""}
-        ">
-          ${item.text}
-        </td>
-      </tr>
-    `
+          <tr>
+            <td style="border:1px solid #ddd; padding:6px; width:30px;">
+              ${item.checked ? "✓" : ""}
+            </td>
+            <td style="
+              border:1px solid #ddd;
+              padding:6px;
+              ${item.checked ? "text-decoration: line-through; color:#888;" : ""}
+            ">
+              ${item.text}
+            </td>
+          </tr>
+        `
       )
       .join("");
 
     const notesHtml = notes
       .map(
         (note) => `
-      <div style="margin-bottom:10px;">
-        <strong>${note.title}</strong><br/>
-        <span style="color:#555;">${note.content || ""}</span>
-      </div>
-    `
+          <div style="margin-bottom:10px;">
+            <strong>${note.title}</strong><br/>
+            <span style="color:#555;">${note.content || ""}</span>
+          </div>
+        `
       )
       .join("");
 
     const content = `
-    <h2>Přehled výletu</h2>
+      <h2>Přehled výletu</h2>
 
-    <table style="width:100%; border-collapse:collapse; font-size:12px;">
-      ${[
-        ["Název", trip.title],
-        ["Destinace", displayLocation],
-        ["Začátek", formatDate(trip.startDate)],
-        ["Konec", formatDate(trip.endDate)],
-        ["Délka", getTripLengthLabel(tripLength)],
-        ["Kategorie", getCategoryLabel(trip.category)]
-      ]
-        .map(
-          ([l, v]) => `
-          <tr>
-            <td style="border:1px solid #ddd; padding:6px; width:30%; font-weight:bold;">
-              ${l}
-            </td>
-            <td style="border:1px solid #ddd; padding:6px;">
-              ${v}
-            </td>
-          </tr>
-        `
-        )
-        .join("")}
-    </table>
+      <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        ${[
+          ["Název", trip.title],
+          ["Destinace", displayLocation],
+          ["Začátek", formatDate(trip.startDate)],
+          ["Konec", formatDate(trip.endDate)],
+          ["Délka", getTripLengthLabel(tripLength)],
+          ["Kategorie", getCategoryLabel(trip.category)]
+        ]
+          .map(
+            ([l, v]) => `
+              <tr>
+                <td style="border:1px solid #ddd; padding:6px; width:30%; font-weight:bold;">
+                  ${l}
+                </td>
+                <td style="border:1px solid #ddd; padding:6px;">
+                  ${v}
+                </td>
+              </tr>
+            `
+          )
+          .join("")}
+      </table>
 
-    <br/>
+      <br/>
 
-    <h2>Checklist</h2>
+      <h2>Checklist</h2>
 
-    <table style="width:100%; border-collapse:collapse; font-size:12px;">
-      ${checklistRows || "<tr><td>Žádné položky</td></tr>"}
-    </table>
+      <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        ${checklistRows || "<tr><td>Žádné položky</td></tr>"}
+      </table>
 
-    <br/>
+      <br/>
 
-    <h2>Poznámky</h2>
+      <h2>Poznámky</h2>
 
-    ${notesHtml || "<p>Žádné poznámky</p>"}
-  `;
+      ${notesHtml || "<p>Žádné poznámky</p>"}
+    `;
 
     const element = createPdfElement(`Detail výletu – ${trip.title}`, content);
 
-    await html2pdf().set({
-      margin: 10,
-      filename: `${getSafeFileName(trip.title)}-detail.pdf`,
-      html2canvas: {
-        scale: 2,
-        useCORS: true
-      },
-      jsPDF: { unit: "mm", format: "a4" }
-    }).from(element).save();
+    await html2pdf()
+      .set({
+        margin: 10,
+        filename: `${getSafeFileName(trip.title)}-detail.pdf`,
+        html2canvas: {
+          scale: 2,
+          useCORS: true
+        },
+        jsPDF: { unit: "mm", format: "a4" }
+      })
+      .from(element)
+      .save();
   };
 
   return (
@@ -854,7 +902,6 @@ function TripDetail({
             >
               <FiFileText />
             </button>
-
           </div>
         </div>
 
@@ -872,13 +919,16 @@ function TripDetail({
               )}
             </div>
 
-            <div className="trip-detail-hero-country-code">{trip.countryCode}</div>
+            <div className="trip-detail-hero-country-code">
+              {trip.countryCode}
+            </div>
           </div>
 
           <div className="trip-detail-hero-content">
             <div className="trip-detail-badges">
               <span className="trip-detail-status-badge">{statusText}</span>
               <span className="trip-detail-season-badge">{season}</span>
+
               {trip.category && (
                 <span className="trip-detail-category-badge">
                   {getCategoryLabel(trip.category)}
@@ -893,6 +943,7 @@ function TripDetail({
                 <FiGlobe />
                 {displayLocation}
               </span>
+
               <span className="trip-detail-subline-item">
                 <FiCalendar />
                 {formatDate(trip.startDate)} – {formatDate(trip.endDate)}
@@ -911,7 +962,9 @@ function TripDetail({
 
           <div className="trip-detail-highlight-card">
             <span className="trip-detail-highlight-label">Destinace</span>
-            <strong className="trip-detail-highlight-value">{displayLocation}</strong>
+            <strong className="trip-detail-highlight-value">
+              {displayLocation}
+            </strong>
           </div>
 
           <div className="trip-detail-highlight-card">
@@ -952,6 +1005,7 @@ function TripDetail({
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution="&copy; OpenStreetMap contributors"
                 />
+
                 <Marker position={[lat, lng]}>
                   <Popup>{displayLocation}</Popup>
                 </Marker>
@@ -1012,12 +1066,13 @@ function TripDetail({
             </div>
           </div>
         </article>
+
         <div className="trip-detail-currency-alerts-grid">
           <CurrencyConverter countryCode={trip.countryCode} />
 
           <WeatherAlertsCard
             notificationsPackage={notificationsPackage}
-            onImport={handleImportNotificationsPackage}
+            onImport={() => handleImportPackage("notifications", "Notifikace")}
             onRemove={() => {
               if (notificationsPackage?._id) {
                 handleDeletePackageCard(notificationsPackage._id);
@@ -1034,9 +1089,11 @@ function TripDetail({
           </div>
 
           {!weatherPackage ? (
-            <p className="trip-detail-muted">
-              Pro tento výlet zatím nebyl importován balíček Počasí.
-            </p>
+            <MissingPackageCard
+              title="Balíček Počasí není přidán"
+              text="Po importu se zde zobrazí aktuální počasí a krátká předpověď pro destinaci výletu."
+              onImport={() => handleImportPackage("weather", "Počasí")}
+            />
           ) : !weatherData ? (
             <p className="trip-detail-muted">Načítám předpověď počasí…</p>
           ) : (
@@ -1054,15 +1111,18 @@ function TripDetail({
             <div>
               <h3 className="trip-detail-section-title">Checklist</h3>
             </div>
+
             <div className="trip-detail-panel-icon">
               <FiCheckSquare />
             </div>
           </div>
 
           {!packingPackage ? (
-            <p className="trip-detail-muted">
-              Pro tento výlet zatím nebyl importován balíček Zabalit.
-            </p>
+            <MissingPackageCard
+              title="Balíček Zabalit není přidán"
+              text="Po importu se zde zobrazí checklist věcí, které si chceš sbalit na cestu."
+              onImport={() => handleImportPackage("packing", "Zabalit")}
+            />
           ) : (
             <>
               {packingPackage?.meta?.generatedFromCategory ? (
@@ -1079,7 +1139,9 @@ function TripDetail({
               <div className="trip-check-progress">
                 <div className="trip-check-progress-top">
                   <span>Sbaleno</span>
-                  <strong>{checkedItems} / {totalItems}</strong>
+                  <strong>
+                    {checkedItems} / {totalItems}
+                  </strong>
                 </div>
 
                 <div className="trip-check-progress-bar">
@@ -1098,12 +1160,16 @@ function TripDetail({
                   >
                     <button
                       type="button"
-                      className={`trip-check-toggle ${item.checked ? "checked" : ""}`}
+                      className={`trip-check-toggle ${
+                        item.checked ? "checked" : ""
+                      }`}
                       onClick={() =>
                         handleTogglePackingItem(packingPackage._id, item._id)
                       }
                       aria-label={
-                        item.checked ? "Označit jako nesbalené" : "Označit jako sbalené"
+                        item.checked
+                          ? "Označit jako nesbalené"
+                          : "Označit jako sbalené"
                       }
                     >
                       {item.checked ? "✓" : ""}
@@ -1136,6 +1202,7 @@ function TripDetail({
                     }
                   }}
                 />
+
                 <button
                   type="button"
                   onClick={handleAddPackingItemInline}
@@ -1165,6 +1232,7 @@ function TripDetail({
               <div>
                 <h3 className="trip-detail-section-title">Poznámky</h3>
               </div>
+
               <div className="trip-detail-panel-icon">
                 <FiFileText />
               </div>
@@ -1273,13 +1341,18 @@ function TripDetail({
                     {pinnedNotes.map((note) => (
                       <div
                         key={note._id}
-                        className={`trip-note-card ${getNoteLabelColorClass(note.labelColor)}`}
+                        className={`trip-note-card ${getNoteLabelColorClass(
+                          note.labelColor
+                        )}`}
                       >
                         <div className="trip-note-card-head">
                           <div>
                             <h4>{note.title}</h4>
                             <span>
-                              Upraveno {new Date(note.updatedAt).toLocaleDateString("cs-CZ")}
+                              Upraveno{" "}
+                              {new Date(note.updatedAt).toLocaleDateString(
+                                "cs-CZ"
+                              )}
                             </span>
                           </div>
 
@@ -1293,7 +1366,9 @@ function TripDetail({
                         </div>
 
                         {note.content ? (
-                          <p className="trip-note-card-content">{note.content}</p>
+                          <p className="trip-note-card-content">
+                            {note.content}
+                          </p>
                         ) : null}
 
                         {note.checklistItems?.length > 0 && (
@@ -1302,8 +1377,12 @@ function TripDetail({
                               <button
                                 key={item._id}
                                 type="button"
-                                className={`trip-note-check-item ${item.checked ? "checked" : ""}`}
-                                onClick={() => handleToggleNoteChecklistItem(note._id, item._id)}
+                                className={`trip-note-check-item ${
+                                  item.checked ? "checked" : ""
+                                }`}
+                                onClick={() =>
+                                  handleToggleNoteChecklistItem(note._id, item._id)
+                                }
                               >
                                 <span className="trip-note-check-box">
                                   {item.checked ? "✓" : ""}
@@ -1320,18 +1399,25 @@ function TripDetail({
 
                 {regularNotes.length > 0 && (
                   <div className="trip-notes-section">
-                    <div className="trip-notes-section-title">Ostatní poznámky</div>
+                    <div className="trip-notes-section-title">
+                      Ostatní poznámky
+                    </div>
 
                     {regularNotes.map((note) => (
                       <div
                         key={note._id}
-                        className={`trip-note-card ${getNoteLabelColorClass(note.labelColor)}`}
+                        className={`trip-note-card ${getNoteLabelColorClass(
+                          note.labelColor
+                        )}`}
                       >
                         <div className="trip-note-card-head">
                           <div>
                             <h4>{note.title}</h4>
                             <span>
-                              Upraveno {new Date(note.updatedAt).toLocaleDateString("cs-CZ")}
+                              Upraveno{" "}
+                              {new Date(note.updatedAt).toLocaleDateString(
+                                "cs-CZ"
+                              )}
                             </span>
                           </div>
 
@@ -1345,7 +1431,9 @@ function TripDetail({
                         </div>
 
                         {note.content ? (
-                          <p className="trip-note-card-content">{note.content}</p>
+                          <p className="trip-note-card-content">
+                            {note.content}
+                          </p>
                         ) : null}
 
                         {note.checklistItems?.length > 0 && (
@@ -1354,8 +1442,12 @@ function TripDetail({
                               <button
                                 key={item._id}
                                 type="button"
-                                className={`trip-note-check-item ${item.checked ? "checked" : ""}`}
-                                onClick={() => handleToggleNoteChecklistItem(note._id, item._id)}
+                                className={`trip-note-check-item ${
+                                  item.checked ? "checked" : ""
+                                }`}
+                                onClick={() =>
+                                  handleToggleNoteChecklistItem(note._id, item._id)
+                                }
                               >
                                 <span className="trip-note-check-box">
                                   {item.checked ? "✓" : ""}

@@ -303,48 +303,7 @@
   line-height: 1.5;
 }
 
-
-@media (hover: none) {
-  .template-card {
-    cursor: pointer;
-  }
-
-  .template-card-overlay {
-    position: static;
-    opacity: 0;
-    max-height: 0;
-    overflow: hidden;
-    pointer-events: none;
-    background: transparent;
-    backdrop-filter: none;
-    padding: 0 clamp(20px, 4vw, 28px);
-    justify-content: flex-start;
-    transition: opacity 0.2s ease, max-height 0.2s ease, padding 0.2s ease;
-  }
-
-  .template-card.template-card--active .template-card-overlay {
-    opacity: 1;
-    max-height: 80px;
-    pointer-events: auto;
-    padding: 0 clamp(20px, 4vw, 28px) clamp(20px, 4vw, 28px);
-  }
-
-  .template-card-overlay-button {
-    width: 100%;
-    min-width: 0;
-    height: 48px;
-    border-radius: 16px;
-    font-size: 1rem;
-  }
-
-  .template-card-base {
-    padding-bottom: 18px;
-  }
-
-  .template-card.template-card--active .template-card-base {
-    padding-bottom: 14px;
-  }
-}
+/* RESPONSIVE */
 
 @media (max-width: 900px) {
   .templates-grid {
@@ -372,9 +331,17 @@
 
   .template-card {
     min-height: 190px;
+    cursor: pointer;
+  }
+
+  .template-card:hover {
+    transform: none;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
+    border-color: #e7edf7;
   }
 
   .template-card-base {
+    min-height: 150px;
     padding: 18px;
   }
 
@@ -384,6 +351,51 @@
 
   .template-card-description {
     line-height: 1.5;
+  }
+
+  .template-card-overlay {
+    position: static;
+    inset: auto;
+    z-index: 3;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    pointer-events: none;
+    background: transparent;
+    backdrop-filter: none;
+    padding: 0 18px;
+    align-items: stretch;
+    justify-content: flex-start;
+    transition: opacity 0.2s ease, max-height 0.2s ease, padding 0.2s ease;
+  }
+
+  .template-card:hover .template-card-overlay,
+  .template-card:focus-within .template-card-overlay {
+    opacity: 0;
+  }
+
+  .template-card.template-card--active {
+    border-color: #c8daf7;
+    box-shadow: 0 18px 38px rgba(15, 23, 42, 0.09);
+  }
+
+  .template-card.template-card--active .template-card-overlay {
+    opacity: 1;
+    max-height: 90px;
+    pointer-events: auto;
+    padding: 0 18px 18px;
+  }
+
+  .template-card.template-card--active .template-card-base {
+    padding-bottom: 14px;
+  }
+
+  .template-card-overlay-button {
+    width: 100%;
+    min-width: 0;
+    height: 48px;
+    border-radius: 16px;
+    font-size: 1rem;
   }
 
   .template-modal-backdrop {
@@ -452,7 +464,7 @@
     padding: 16px;
   }
 
-  .template-card-overlay {
+  .template-card.template-card--active .template-card-overlay {
     padding: 0 16px 16px;
   }
 
@@ -468,4 +480,3 @@
     font-size: 0.88rem;
   }
 }
-

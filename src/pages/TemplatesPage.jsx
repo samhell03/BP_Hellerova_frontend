@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
-import { importTemplatePackage } from "../api/packages";
+import { getTripPackages, importTemplatePackage } from "../api/packages";
 import { showError, showSuccess } from "../utils/toast";
 import "../styles/templates.css";
 
@@ -27,13 +27,47 @@ function TemplatesPage({ myTrips = [] }) {
   const [activeTemplateKey, setActiveTemplateKey] = useState(null);
   const [tripSearch, setTripSearch] = useState("");
   const [loadingKey, setLoadingKey] = useState("");
+  const [packageTypesByTrip, setPackageTypesByTrip] = useState({});
+  const [packagesLoading, setPackagesLoading] = useState(false);
+
+  const loadTripPackageTypes = async () => {
+    try {
+      setPackagesLoading(true);
+
+      const result = {};
+
+      await Promise.all(
+        myTrips.map(async (trip) => {
+          const packages = await getTripPackages(trip._id);
+          result[trip._id] = Array.isArray(packages)
+            ? packages.map((item) => item.type)
+            : [];
+        })
+      );
+
+      setPackageTypesByTrip(result);
+    } catch (err) {
+      showError(err.message || "Nepodařilo se načíst balíčky výletů.");
+    } finally {
+      setPackagesLoading(false);
+    }
+  };
+
+  const tripsWithoutSelectedPackage = useMemo(() => {
+    if (!selectedTemplate) return [];
+
+    return myTrips.filter((trip) => {
+      const packageTypes = packageTypesByTrip[trip._id] || [];
+      return !packageTypes.includes(selectedTemplate.key);
+    });
+  }, [myTrips, packageTypesByTrip, selectedTemplate]);
 
   const filteredTrips = useMemo(() => {
     const q = tripSearch.trim().toLowerCase();
 
-    if (!q) return myTrips;
+    if (!q) return tripsWithoutSelectedPackage;
 
-    return myTrips.filter((trip) => {
+    return tripsWithoutSelectedPackage.filter((trip) => {
       const haystack = [trip.title, trip.city, trip.country]
         .filter(Boolean)
         .join(" ")
@@ -41,7 +75,7 @@ function TemplatesPage({ myTrips = [] }) {
 
       return haystack.includes(q);
     });
-  }, [myTrips, tripSearch]);
+  }, [tripsWithoutSelectedPackage, tripSearch]);
 
   const handleTemplateCardClick = (template) => {
     setActiveTemplateKey((prevKey) =>
@@ -49,9 +83,10 @@ function TemplatesPage({ myTrips = [] }) {
     );
   };
 
-  const openImportModal = (template) => {
+  const openImportModal = async (template) => {
     setSelectedTemplate(template);
     setTripSearch("");
+    await loadTripPackageTypes();
   };
 
   const closeImportModal = () => {
@@ -66,6 +101,12 @@ function TemplatesPage({ myTrips = [] }) {
     try {
       setLoadingKey(tripId);
       await importTemplatePackage(selectedTemplate.key, tripId);
+
+      setPackageTypesByTrip((prev) => ({
+        ...prev,
+        [tripId]: [...(prev[tripId] || []), selectedTemplate.key],
+      }));
+
       showSuccess("Balíček byl úspěšně importován do výletu!");
       closeImportModal();
     } catch (err) {
@@ -127,7 +168,7 @@ function TemplatesPage({ myTrips = [] }) {
                   {selectedTemplate.title}
                 </h2>
                 <p className="template-modal-text">
-                  Zvolte výlet, do kterého chcete balíček importovat.
+                  Zobrazují se pouze výlety, ve kterých tento balíček ještě není.
                 </p>
               </div>
 
@@ -152,9 +193,13 @@ function TemplatesPage({ myTrips = [] }) {
             </div>
 
             <div className="template-modal-trip-list">
-              {filteredTrips.length === 0 ? (
+              {packagesLoading ? (
                 <div className="template-modal-empty">
-                  Nebyl nalezen žádný odpovídající výlet.
+                  Načítám dostupné výlety…
+                </div>
+              ) : filteredTrips.length === 0 ? (
+                <div className="template-modal-empty">
+                  Tento balíček už je ve všech odpovídajících výletech importovaný.
                 </div>
               ) : (
                 filteredTrips.map((trip) => {

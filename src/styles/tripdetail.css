@@ -1502,3 +1502,30 @@
     padding: 14px;
   }
 }
+
+.trip-detail-missing-package {
+  min-height: 180px;
+  border: 1px dashed #cbd8ec;
+  border-radius: 22px;
+  background: #f8fbff;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.trip-detail-missing-package h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.trip-detail-missing-package p {
+  margin: 0 0 6px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #64748b;
+}
