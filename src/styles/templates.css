@@ -485,3 +485,32 @@
     font-size: 0.88rem;
   }
 }
+
+@media (max-width: 700px) {
+  .template-card-base {
+    height: auto !important;
+  }
+
+  .template-card.template-card--active .template-card-overlay {
+    position: static !important;
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    max-height: 120px !important;
+    height: auto !important;
+    pointer-events: auto !important;
+    padding: 0 18px 18px !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+  }
+
+  .template-card.template-card--active .template-card-overlay-button {
+    display: block !important;
+    width: 100% !important;
+    height: 48px !important;
+  }
+}
+
+.template-card-base {
+  height: auto !important;
+}

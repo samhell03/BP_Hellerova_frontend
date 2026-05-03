@@ -132,10 +132,15 @@ function TemplatesPage({ myTrips = [] }) {
           {TEMPLATES.map((template) => (
             <article
               key={template.key}
-              className={`template-card ${
-                activeTemplateKey === template.key ? "template-card--active" : ""
-              }`}
-              onClick={() => handleTemplateCardClick(template)}
+              className={`template-card ${activeTemplateKey === template.key ? "template-card--active" : ""
+                }`}
+              onPointerUp={(e) => {
+                if (e.target.closest("button")) return;
+
+                setActiveTemplateKey((prevKey) =>
+                  prevKey === template.key ? null : template.key
+                );
+              }}
             >
               <div className="template-card-base">
                 <h3 className="template-card-title">{template.title}</h3>
@@ -148,6 +153,9 @@ function TemplatesPage({ myTrips = [] }) {
                 <button
                   type="button"
                   className="template-card-overlay-button"
+                  onPointerUp={(e) => {
+                    e.stopPropagation();
+                  }}
                   onClick={(e) => {
                     e.stopPropagation();
                     openImportModal(template);
