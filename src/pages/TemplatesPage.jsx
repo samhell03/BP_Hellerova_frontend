@@ -19,15 +19,14 @@ const TEMPLATES = [
     key: "packing",
     title: "Zabalit",
     description: "Seznam věcí k zabalení.",
-  }
+  },
 ];
 
 function TemplatesPage({ myTrips = [] }) {
-  const handleTemplateCardClick = (template) => {
-    setActiveTemplateKey((prevKey) =>
-      prevKey === template.key ? null : template.key
-    );
-  };
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [activeTemplateKey, setActiveTemplateKey] = useState(null);
+  const [tripSearch, setTripSearch] = useState("");
+  const [loadingKey, setLoadingKey] = useState("");
 
   const filteredTrips = useMemo(() => {
     const q = tripSearch.trim().toLowerCase();
@@ -43,6 +42,12 @@ function TemplatesPage({ myTrips = [] }) {
       return haystack.includes(q);
     });
   }, [myTrips, tripSearch]);
+
+  const handleTemplateCardClick = (template) => {
+    setActiveTemplateKey((prevKey) =>
+      prevKey === template.key ? null : template.key
+    );
+  };
 
   const openImportModal = (template) => {
     setSelectedTemplate(template);
@@ -76,51 +81,51 @@ function TemplatesPage({ myTrips = [] }) {
         <div className="templates-page-header">
           <h1 className="templates-page-title">Šablony balíčků</h1>
           <p className="templates-page-text">
-            Zvolte si balíček, který chcete importovat do svého výletu
+            Zvolte si balíček, který chcete importovat do svého výletu.
           </p>
         </div>
 
         <div className="templates-grid">
-          {TEMPLATES.map((template) => {
-            return (
-              <article
-                key={template.key}
-                className={`template-card ${activeTemplateKey === template.key ? "template-card--active" : ""
-                  }`}
-                onClick={() => handleTemplateCardClick(template)}
-              >
-                <div className="template-card-base">
-                  <h3 className="template-card-title">{template.title}</h3>
-                  <p className="template-card-description">{template.description}</p>
-                </div>
+          {TEMPLATES.map((template) => (
+            <article
+              key={template.key}
+              className={`template-card ${
+                activeTemplateKey === template.key ? "template-card--active" : ""
+              }`}
+              onClick={() => handleTemplateCardClick(template)}
+            >
+              <div className="template-card-base">
+                <h3 className="template-card-title">{template.title}</h3>
+                <p className="template-card-description">
+                  {template.description}
+                </p>
+              </div>
 
-                <div className="template-card-overlay">
-                  <button
-                    type="button"
-                    className="template-card-overlay-button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openImportModal(template);
-                    }}
-                  >
-                    Importovat
-                  </button>
-                </div>
-              </article>
-            );
-          })}
+              <div className="template-card-overlay">
+                <button
+                  type="button"
+                  className="template-card-overlay-button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openImportModal(template);
+                  }}
+                >
+                  Importovat
+                </button>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
       {selectedTemplate && (
         <div className="template-modal-backdrop" onClick={closeImportModal}>
-          <div
-            className="template-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="template-modal" onClick={(e) => e.stopPropagation()}>
             <div className="template-modal-header">
               <div>
-                <h2 className="template-modal-title">{selectedTemplate.title}</h2>
+                <h2 className="template-modal-title">
+                  {selectedTemplate.title}
+                </h2>
                 <p className="template-modal-text">
                   Zvolte výlet, do kterého chcete balíček importovat.
                 </p>
@@ -130,6 +135,7 @@ function TemplatesPage({ myTrips = [] }) {
                 type="button"
                 className="template-modal-close"
                 onClick={closeImportModal}
+                aria-label="Zavřít okno"
               >
                 <FiX />
               </button>
