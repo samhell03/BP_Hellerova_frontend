@@ -4,7 +4,15 @@ function ProtectedRoute({ isLoggedIn, authChecked, children }) {
   const location = useLocation();
 
   if (!authChecked) {
-    return null;
+    return (
+      <div className="app-loading-screen">
+        <div className="app-loading-card">
+          <div className="app-loading-spinner"></div>
+          <h2>Ověřuji data</h2>
+          <p>Probíhá kontrola přihlášení.</p>
+        </div>
+      </div>
+    );
   }
 
   if (!isLoggedIn) {

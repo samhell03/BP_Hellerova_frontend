@@ -2,7 +2,7 @@ import API from "./api";
 const PACKAGES_API_URL = `${API}/api/packages`;
 
 function getAuthHeaders(includeContentType = false) {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const headers = {};
 
   if (includeContentType) {

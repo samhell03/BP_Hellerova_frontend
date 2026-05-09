@@ -48,7 +48,7 @@ function GuestHomePage() {
                 <span>03</span>
                 <div>
                   <strong>Balíčky k výletům</strong>
-                  <p>Checklisty, počasí, kontakty a upozornění podle typu cesty.</p>
+                  <p>Checklisty, počasí a upozornění.</p>
                 </div>
               </div>
 

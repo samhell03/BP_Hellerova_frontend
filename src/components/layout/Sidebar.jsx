@@ -40,7 +40,12 @@ function Sidebar({
             </button>
           </div>
 
-          {!authChecked ? null : !isLoggedIn ? (
+          {!authChecked ? (
+            <div className="sidebar-auth-loading">
+              <div className="sidebar-loading-spinner"></div>
+              <p>Ověřuji data...</p>
+            </div>
+          ) : !isLoggedIn ? (
             <AuthForm
               setIsLoggedIn={setIsLoggedIn}
               setUserId={setUserId}

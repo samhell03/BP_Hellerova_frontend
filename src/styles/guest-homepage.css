@@ -1,3 +1,5 @@
+/* page */
+
 .guest-home-page {
   width: min(1180px, 100%);
   margin: 0 auto;
@@ -7,6 +9,9 @@
   background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
   box-shadow: 0 20px 50px rgba(15, 23, 42, 0.05);
 }
+
+
+/* hero */
 
 .guest-home-hero {
   display: grid;
@@ -41,12 +46,15 @@
 }
 
 .guest-home-content > p {
-  margin: 24px 0 0;
   max-width: 650px;
+  margin: 24px 0 0;
   color: #667085;
   font-size: clamp(1rem, 1.7vw, 1.18rem);
   line-height: 1.8;
 }
+
+
+/* notice */
 
 .guest-home-notice {
   margin-top: 34px;
@@ -70,6 +78,9 @@
   line-height: 1.7;
 }
 
+
+/* panel */
+
 .guest-home-panel {
   padding: 28px;
   border-radius: 28px;
@@ -83,6 +94,9 @@
   color: #101828;
   font-size: 1.35rem;
 }
+
+
+/* features */
 
 .guest-feature-list {
   display: flex;
@@ -103,12 +117,12 @@
   width: 42px;
   height: 42px;
   border-radius: 14px;
+  border: 1px solid #e5eaf2;
+  background: #ffffff;
+  color: #315caa;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
-  border: 1px solid #e5eaf2;
-  color: #315caa;
   font-size: 0.8rem;
   font-weight: 800;
 }
@@ -127,7 +141,8 @@
   line-height: 1.55;
 }
 
-/* RESPONSIVE */
+
+/* responsive */
 
 @media (max-width: 1200px) {
   .guest-home-hero {

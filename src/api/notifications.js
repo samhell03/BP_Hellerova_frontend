@@ -3,7 +3,7 @@ import API from "./api";
 const NOTIFICATIONS_API_URL = `${API}/api/notifications`;
 
 function getAuthHeaders() {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   return {
     "Content-Type": "application/json",

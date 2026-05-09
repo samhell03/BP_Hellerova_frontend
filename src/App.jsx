@@ -35,9 +35,9 @@ function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const storedToken = localStorage.getItem("token");
-  const storedUserId = localStorage.getItem("userId");
-  const storedUserName = localStorage.getItem("userName");
+  const storedToken = sessionStorage.getItem("token");
+  const storedUserId = sessionStorage.getItem("userId");
+  const storedUserName = sessionStorage.getItem("userName");
 
   const [authChecked, setAuthChecked] = useState(!storedToken);
   const [isLoggedIn, setIsLoggedIn] = useState(Boolean(storedToken));
@@ -73,7 +73,7 @@ function AppContent() {
     let isMounted = true;
 
     const initAuth = async () => {
-      const hasToken = Boolean(localStorage.getItem("token"));
+      const hasToken = Boolean(sessionStorage.getItem("token"));
 
       if (!hasToken) {
         if (!isMounted) return;
@@ -183,6 +183,30 @@ function AppContent() {
     await fetchTrips();
     setTripRefreshKey((prev) => prev + 1);
   };
+
+  if (!authChecked) {
+    return (
+      <>
+        <Sidebar
+          isLoggedIn={false}
+          authChecked={authChecked}
+          setIsLoggedIn={setIsLoggedIn}
+          setUserId={setUserId}
+          setUserName={setUserName}
+          fetchTrips={fetchTrips}
+          handleLogout={handleLogout}
+        />
+
+        <div className="app-loading-screen">
+          <div className="app-loading-card">
+            <div className="app-loading-spinner"></div>
+            <h2>Ověřuji data</h2>
+            <p>Probíhá kontrola přihlášení a načítání aplikace.</p>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

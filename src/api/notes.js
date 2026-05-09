@@ -2,7 +2,7 @@ import API from "./api";
 const BASE_URL = `${API}/api/notes`;
 
 function getAuthHeaders() {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   return {
     "Content-Type": "application/json",

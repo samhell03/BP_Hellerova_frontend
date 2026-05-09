@@ -548,7 +548,7 @@ export default function NewTrip({ onClose, onSave, tripToEdit }) {
       return;
     }
 
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     if (!token) {
       const message = "Uživatel není přihlášen. Zkus se znovu přihlásit.";

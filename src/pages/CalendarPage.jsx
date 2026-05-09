@@ -293,7 +293,7 @@ function CalendarPage({ isLoggedIn, myTrips = [] }) {
             </div>
 
             <div className="calendar-grid">
-              {dayItems.map(({ date, trips }) => {
+              {dayItems.map(({ date, trips }, index) => {
                 const isCurrentMonth =
                   date.getMonth() === currentMonth.getMonth() &&
                   date.getFullYear() === currentMonth.getFullYear();
@@ -306,11 +306,9 @@ function CalendarPage({ isLoggedIn, myTrips = [] }) {
                 return (
                   <div
                     key={date.toISOString()}
-                    className={`calendar-day ${
-                      isCurrentMonth ? "" : "calendar-day-outside"
-                    } ${isToday ? "calendar-day-today" : ""} ${
-                      hasTrips ? "calendar-day-clickable" : ""
-                    } ${isSelected ? "calendar-day-selected" : ""}`}
+                    className={`calendar-day calendar-day-col-${index % 7} ${isCurrentMonth ? "" : "calendar-day-outside"
+                      } ${isToday ? "calendar-day-today" : ""} ${hasTrips ? "calendar-day-clickable" : ""
+                      } ${isSelected ? "calendar-day-selected" : ""}`}
                     onClick={() => {
                       if (hasTrips) {
                         setSelectedDayKey(isSelected ? null : dayKey);
@@ -418,9 +416,8 @@ function CalendarPage({ isLoggedIn, myTrips = [] }) {
                 </span>
 
                 <FiChevronDown
-                  className={`calendar-accordion-icon ${
-                    isLegendOpen ? "open" : ""
-                  }`}
+                  className={`calendar-accordion-icon ${isLegendOpen ? "open" : ""
+                    }`}
                 />
               </button>
 
@@ -430,9 +427,8 @@ function CalendarPage({ isLoggedIn, myTrips = [] }) {
                 </p>
               ) : (
                 <div
-                  className={`calendar-legend-list ${
-                    isLegendOpen ? "open" : ""
-                  }`}
+                  className={`calendar-legend-list ${isLegendOpen ? "open" : ""
+                    }`}
                 >
                   {coloredTrips.map((trip) => {
                     const displayCountry = getCountryDisplayName(

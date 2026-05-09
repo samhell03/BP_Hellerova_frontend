@@ -1,3 +1,4 @@
+/* page */
 .home-page {
   display: flex;
   flex-direction: column;
@@ -10,19 +11,20 @@
   min-height: calc(100vh - 120px);
   border: 1px solid #e5eaf2;
   box-shadow: 0 20px 50px rgba(15, 23, 42, 0.04);
-
   max-width: 100%;
-  overflow-x: hidden; /* 🔥 FIX přetékání */
+  overflow-x: hidden;
 }
 
-/* GLOBAL FIX (hlavně pro mapu) */
+
+/* global fix */
 .home-page *,
 .home-page *::before,
 .home-page *::after {
   box-sizing: border-box;
 }
 
-/* MAPA FIX */
+
+/* mapa */
 .home-page .leaflet-container {
   width: 100% !important;
   max-width: 100%;
@@ -31,8 +33,8 @@
   overflow: hidden;
 }
 
-/* ===== HERO ===== */
 
+/* hero */
 .home-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(240px, 320px);
@@ -84,8 +86,8 @@
   min-height: 44px;
 }
 
-/* ===== SIDE CARD ===== */
 
+/* side card */
 .home-side-card {
   min-width: 0;
   padding: 24px;
@@ -93,7 +95,6 @@
   border: 1px solid var(--border);
   background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
   box-shadow: 0 14px 32px rgba(15, 23, 42, 0.05);
-  align-self: stretch;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -129,10 +130,8 @@
   line-height: 1.6;
 }
 
-/* =========================================================
-   RESPONSIVE
-========================================================= */
 
+/* responsive */
 @media (max-width: 1200px) {
   .home-page {
     width: 100%;
@@ -179,7 +178,6 @@
     border-radius: 20px;
   }
 
-  /* mapa */
   .home-page .leaflet-container {
     height: 360px;
   }
@@ -212,7 +210,6 @@
     font-size: 0.88rem;
   }
 
-  /* mapa */
   .home-page .leaflet-container {
     height: 300px;
   }

@@ -61,19 +61,19 @@ export async function loginUser(formData) {
 }
 
 export function saveAuthData(data) {
-  localStorage.setItem("token", data.token);
-  localStorage.setItem("userId", data.userId);
-  localStorage.setItem("userName", data.userName);
+  sessionStorage.setItem("token", data.token);
+  sessionStorage.setItem("userId", data.userId);
+  sessionStorage.setItem("userName", data.userName);
 }
 
 export function clearAuthData() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("userId");
-  localStorage.removeItem("userName");
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("userId");
+  sessionStorage.removeItem("userName");
 }
 
 export async function fetchMe() {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   if (!token) {
     return null;
@@ -103,7 +103,7 @@ export async function fetchMe() {
 }
 
 export async function fetchMeDetailed() {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   if (!token) {
     return null;
@@ -128,10 +128,10 @@ export async function fetchMeDetailed() {
 }
 
 export async function changePassword(payload) {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   if (!token) {
-    throw new Error("Nejste přihlášena.");
+    throw new Error("Nejste přihlášen.");
   }
 
   const response = await fetch(`${AUTH_API_URL}/change-password`, {
@@ -147,10 +147,10 @@ export async function changePassword(payload) {
 }
 
 export async function requestPasswordChangeCode(payload) {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   if (!token) {
-    throw new Error("Nejste přihlášena.");
+    throw new Error("Nejste přihlášen.");
   }
 
   const response = await fetch(`${AUTH_API_URL}/request-password-change-code`, {
@@ -166,10 +166,10 @@ export async function requestPasswordChangeCode(payload) {
 }
 
 export async function confirmPasswordChange(code) {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   if (!token) {
-    throw new Error("Nejste přihlášena.");
+    throw new Error("Nejste přihlášen.");
   }
 
   const response = await fetch(`${AUTH_API_URL}/confirm-password-change`, {
@@ -185,10 +185,10 @@ export async function confirmPasswordChange(code) {
 }
 
 export async function updateUserName(userName) {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   if (!token) {
-    throw new Error("Nejste přihlášena.");
+    throw new Error("Nejste přihlášen.");
   }
 
   const response = await fetch(`${AUTH_API_URL}/update-name`, {
@@ -203,7 +203,7 @@ export async function updateUserName(userName) {
   const data = await parseJsonResponse(response);
 
   if (data.userName) {
-    localStorage.setItem("userName", data.userName);
+    sessionStorage.setItem("userName", data.userName);
   }
 
   return data;

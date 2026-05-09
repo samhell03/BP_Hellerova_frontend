@@ -2,7 +2,7 @@ import API from "./api";
 const TRIPS_API_URL = `${API}/api/trips`;
 
 function getAuthHeaders(includeContentType = false) {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   const headers = {};
 
@@ -28,7 +28,7 @@ async function parseResponse(response, defaultMessage) {
 }
 
 export async function getTrips() {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   if (!token) {
     return [];
