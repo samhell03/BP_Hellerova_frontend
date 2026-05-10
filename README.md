@@ -1,4 +1,4 @@
-# Samira Hellerová: bakalářská práce (Aplikace pro cestovatele) – frontend
+# Aplikace pro cestovatele – frontend
 
 Frontendová část webové aplikace vytvořené v rámci bakalářské práce.  
 Aplikace slouží k plánování a správě výletů, evidenci navštívených destinací, práci s cestovními balíčky, checklisty, poznámkami, kalendářem, statistikami a uživatelským účtem.
