@@ -298,7 +298,7 @@ function AuthForm({
       !nextErrors.personalDataConsent
     );
   };
- 
+
 
   const validateLoginForm = () => {
     const nextErrors = {
@@ -882,6 +882,27 @@ function AuthForm({
                   {showForgotPassword.newPassword ? <FiEyeOff /> : <FiEye />}
                 </button>
               </div>
+              {forgotNewPassword && (
+                <div className="sidebar-password-strength">
+                  <div className="sidebar-password-strength-bars">
+                    {[1, 2, 3, 4, 5].map((bar) => {
+                      const strength = getPasswordStrength(forgotNewPassword);
+
+                      return (
+                        <span
+                          key={bar}
+                          className={`sidebar-strength-bar ${bar <= strength.score ? strength.className : ""
+                            }`}
+                        />
+                      );
+                    })}
+                  </div>
+
+                  <span className="sidebar-password-strength-label">
+                    {getPasswordStrength(forgotNewPassword).label}
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="sidebar-form-group">

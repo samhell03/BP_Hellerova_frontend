@@ -147,9 +147,6 @@ function Profile({ isLoggedIn, myTrips, setUserName }) {
     const loadProfile = async () => {
       try {
         const data = await fetchMeDetailed();
-
-        console.log("PROFILE DATA:", data);
-
         const userData = data?.user || data;
 
         if (userData) {
