@@ -185,7 +185,5 @@ Důvodem je tzv. „probuzení serveru“ po delší době neaktivity.
 
 ---
 
-## Autorka
-
 **Samira Hellerová - TUL 2026**  
 Bakalářská práce
