@@ -1,0 +1,126 @@
+.trip-pdf {
+  width: 720px;
+  padding: 28px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  color: #13203a;
+  background: #ffffff;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.trip-pdf-header {
+  border-bottom: 1px solid #e5ecf6;
+  padding-bottom: 12px;
+  margin-bottom: 18px;
+}
+
+.trip-pdf-title {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+  color: #13203a;
+}
+
+.trip-pdf-date {
+  margin: 6px 0 0;
+  color: #6a7891;
+  font-size: 10px;
+}
+
+.trip-pdf-section {
+  margin-top: 18px;
+}
+
+.trip-pdf-section-avoid {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.trip-pdf-section-title {
+  font-size: 15px;
+  margin: 0 0 8px;
+}
+
+.trip-pdf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.trip-pdf-table td {
+  border: 1px solid #ddd;
+  padding: 6px;
+}
+
+.trip-pdf-table-label {
+  width: 30%;
+  font-weight: bold;
+}
+
+.trip-pdf-checklist {
+  column-gap: 22px;
+}
+
+.trip-pdf-checklist-1 {
+  column-count: 1;
+}
+
+.trip-pdf-checklist-2 {
+  column-count: 2;
+}
+
+.trip-pdf-checklist-3 {
+  column-count: 3;
+}
+
+.trip-pdf-checklist-item {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  padding: 5px 0;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 11px;
+}
+
+.trip-pdf-checkbox {
+  width: 14px;
+  min-width: 14px;
+  height: 14px;
+  border: 1px solid #cbd5e1;
+  text-align: center;
+  line-height: 13px;
+  font-size: 10px;
+  color: #2563eb;
+}
+
+.trip-pdf-item-checked {
+  text-decoration: line-through;
+  color: #888;
+}
+
+.trip-pdf-notes {
+  page-break-before: always;
+  break-before: page;
+  padding-top: 8px;
+}
+
+.trip-pdf-note {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: 14px;
+}
+
+.trip-pdf-note-title {
+  font-size: 12px;
+}
+
+.trip-pdf-note-content {
+  margin: 4px 0 0;
+  color: #555;
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}

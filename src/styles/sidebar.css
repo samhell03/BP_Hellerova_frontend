@@ -413,6 +413,49 @@
   animation: sidebarSpin 0.8s linear infinite;
 }
 
+.auth-loading-note {
+  margin: 10px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #64748b;
+  text-align: center;
+  animation: authFadeIn 0.25s ease;
+}
+
+.auth-loading-note::after {
+  content: "";
+  display: inline-block;
+  min-width: 18px;
+  animation: authDots 1.2s infinite steps(3);
+}
+
+@keyframes authFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes authDots {
+  0% {
+    content: ".";
+  }
+
+  33% {
+    content: "..";
+  }
+
+  66%,
+  100% {
+    content: "...";
+  }
+}
+
 @keyframes sidebarSpin {
   to {
     transform: rotate(360deg);

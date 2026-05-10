@@ -364,6 +364,18 @@
   color: #cf3e3e;
 }
 
+.profile-info-message {
+  margin-top: 2px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: #eef4ff;
+  border: 1px solid #d6e4ff;
+  color: #36527a;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
 /* STATS */
 
 .profile-stats {

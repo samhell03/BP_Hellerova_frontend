@@ -190,11 +190,15 @@ function AuthForm({
       }
 
       if (field === "password") {
-        next.password = value ? validatePassword(value) : "";
+        if (isRegistering) {
+          next.password = value ? validatePassword(value) : "";
 
-        if (isRegistering && nextValues.confirmPassword) {
-          next.confirmPassword =
-            value === nextValues.confirmPassword ? "" : "Hesla se neshodují.";
+          if (nextValues.confirmPassword) {
+            next.confirmPassword =
+              value === nextValues.confirmPassword ? "" : "Hesla se neshodují.";
+          }
+        } else {
+          next.password = "";
         }
       }
 
@@ -294,6 +298,7 @@ function AuthForm({
       !nextErrors.personalDataConsent
     );
   };
+ 
 
   const validateLoginForm = () => {
     const nextErrors = {
@@ -834,7 +839,7 @@ function AuthForm({
           <>
             <p className="sidebar-password-hint" style={{ marginBottom: "1rem" }}>
               Na adresu <strong>{forgotEmail}</strong> jsme poslali ověřovací kód.
-              Zadejte ho a nastavte si nové heslo.
+              Zadejte ho a nastavte si nové heslo. (Zkontrolujte složku spam nebo hromadnou poštu).
             </p>
 
             <div className="sidebar-form-group">
@@ -1160,11 +1165,25 @@ function AuthForm({
 
       <button className="btn-primary" type="submit" disabled={isSubmitting}>
         {isSubmitting
-          ? "Ukládám..."
+          ? isRegistering
+            ? "Vytvářím účet..."
+            : "Probíhá přihlášení..."
           : isRegistering
             ? "Zaregistrovat se"
             : "Přihlásit se"}
       </button>
+
+      {isSubmitting && !isRegistering && (
+        <p className="auth-loading-note">
+          Probíhá přihlašování. Pokud byl server delší dobu neaktivní, může to chvíli trvat
+        </p>
+      )}
+
+      {isSubmitting && isRegistering && (
+        <p className="auth-loading-note">
+          Vytváří se účet. Pokud byl server delší dobu neaktivní, může to chvíli trvat
+        </p>
+      )}
 
       {!isRegistering && (
         <button

@@ -101,7 +101,8 @@ function Profile({ isLoggedIn, myTrips, setUserName }) {
     userId: "",
     userName: "",
     email: "",
-    createdAt: ""
+    createdAt: "",
+    authProvider: ""
   });
 
   const [nameValue, setNameValue] = useState("");
@@ -144,16 +145,26 @@ function Profile({ isLoggedIn, myTrips, setUserName }) {
 
   useEffect(() => {
     const loadProfile = async () => {
-      const data = await fetchMeDetailed();
+      try {
+        const data = await fetchMeDetailed();
 
-      if (data) {
-        setProfile({
-          userId: data.userId || "",
-          userName: data.userName || "",
-          email: data.email || "",
-          createdAt: data.createdAt || ""
-        });
-        setNameValue(data.userName || "");
+        console.log("PROFILE DATA:", data);
+
+        const userData = data?.user || data;
+
+        if (userData) {
+          setProfile({
+            userId: userData.userId || userData._id || "",
+            userName: userData.userName || "",
+            email: userData.email || "",
+            createdAt: userData.createdAt || "",
+            authProvider: userData.authProvider || ""
+          });
+
+          setNameValue(userData.userName || "");
+        }
+      } catch (error) {
+        console.error("Chyba při načítání profilu:", error);
       }
     };
 
@@ -675,170 +686,172 @@ function Profile({ isLoggedIn, myTrips, setUserName }) {
             </div>
           </section>
 
-          <section className="profile-card">
-            <div className="profile-card-header">
-              <h2>Heslo</h2>
-              <p className="profile-password-hint">
-                Heslo musí mít alespoň 6 znaků, obsahovat velké písmeno a
-                číslici nebo speciální znak
-              </p>
-            </div>
-
-            <form
-              className="profile-password-form"
-              onSubmit={isCodeSent ? handleSubmitPassword : handleRequestPasswordCode}
-              noValidate
-            >
-              <div className="profile-form-group">              <label>Aktuální heslo</label>
-                <div className="password-input-wrapper">
-                  <input
-                    type={showPassword.current ? "text" : "password"}
-                    value={passwordData.currentPassword}
-                    onChange={(e) =>
-                      handlePasswordChange("currentPassword", e.target.value)
-                    }
-                  />
-                  <button
-                    type="button"
-                    className="password-toggle"
-                    onClick={() => togglePasswordVisibility("current")}
-                    aria-label={
-                      showPassword.current ? "Skrýt aktuální heslo" : "Zobrazit aktuální heslo"
-                    }
-                  >
-                    {showPassword.current ? <FiEyeOff /> : <FiEye />}
-                  </button>
-                </div>
-                {fieldErrors.currentPassword && (
-                  <p className="profile-field-error">{fieldErrors.currentPassword}</p>
-                )}
+          {profile.authProvider === "google" ? (
+            <section className="profile-card">
+              <div className="profile-card-header">
+                <h2>Heslo</h2>
+                <p className="profile-password-hint">
+                  Tento účet je přihlášen prostřednictvím Google.
+                </p>
               </div>
 
-              <div className="profile-form-group">
-                <label>Nové heslo</label>
-                <div className="password-input-wrapper">
-                  <input
-                    type={showPassword.new ? "text" : "password"}
-                    value={passwordData.newPassword}
-                    onChange={(e) =>
-                      handlePasswordChange("newPassword", e.target.value)
-                    }
-                    onCopy={preventCopy}
-                    onCut={preventCopy}
-                    autoComplete="new-password"
-                  />
-                  <button
-                    type="button"
-                    className="password-toggle"
-                    onClick={() => togglePasswordVisibility("new")}
-                    aria-label={
-                      showPassword.new ? "Skrýt nové heslo" : "Zobrazit nové heslo"
-                    }
-                  >
-                    {showPassword.new ? <FiEyeOff /> : <FiEye />}
-                  </button>
-                </div>
-
-                {fieldErrors.newPassword && (
-                  <p className="profile-field-error">{fieldErrors.newPassword}</p>
-                )}
-
-                {passwordData.newPassword && (
-                  <div className="profile-password-strength">
-                    <div className="profile-password-strength-bars">
-                      <span className={`strength-bar ${passwordStrength.score >= 1 ? passwordStrength.className : ""}`}></span>
-                      <span className={`strength-bar ${passwordStrength.score >= 2 ? passwordStrength.className : ""}`}></span>
-                      <span className={`strength-bar ${passwordStrength.score >= 3 ? passwordStrength.className : ""}`}></span>
-                      <span className={`strength-bar ${passwordStrength.score >= 4 ? passwordStrength.className : ""}`}></span>
-                      <span className={`strength-bar ${passwordStrength.score >= 5 ? passwordStrength.className : ""}`}></span>
-                    </div>
-
-                    <span className={`profile-password-strength-label ${passwordStrength.className}`}>
-                      {passwordStrength.label}
-                    </span>
-                  </div>
-                )}
+              <div className="profile-info-message">
+                Heslo není spravováno touto aplikací, ale externím poskytovatelem.
+                Změnu hesla je možné provést přímo v nastavení účtu Google.
+              </div>
+            </section>
+          ) : (
+            <section className="profile-card">
+              <div className="profile-card-header">
+                <h2>Heslo</h2>
+                <p className="profile-password-hint">
+                  Heslo musí mít alespoň 6 znaků, obsahovat velké písmeno a
+                  číslici nebo speciální znak
+                </p>
               </div>
 
-              <div className="profile-form-group">
-                <label>Potvrzení nového hesla</label>
-                <div className="password-input-wrapper">
-                  <input
-                    type={showPassword.confirm ? "text" : "password"}
-                    value={passwordData.confirmPassword}
-                    onChange={(e) =>
-                      handlePasswordChange("confirmPassword", e.target.value)
-                    }
-                    onPaste={preventPaste}
-                    onDrop={preventPaste}
-                    autoComplete="new-password"
-                  />
-                  <button
-                    type="button"
-                    className="password-toggle"
-                    onClick={() => togglePasswordVisibility("confirm")}
-                    aria-label={
-                      showPassword.confirm
-                        ? "Skrýt potvrzení hesla"
-                        : "Zobrazit potvrzení hesla"
-                    }
-                  >
-                    {showPassword.confirm ? <FiEyeOff /> : <FiEye />}
-                  </button>
-                </div>
-
-                {fieldErrors.confirmPassword && (
-                  <p className="profile-field-error">{fieldErrors.confirmPassword}</p>
-                )}
-              </div>
-
-              {isCodeSent && (
+              <form
+                className="profile-password-form"
+                onSubmit={isCodeSent ? handleSubmitPassword : handleRequestPasswordCode}
+                noValidate
+              >
                 <div className="profile-form-group">
-                  <label>Ověřovací kód z e-mailu</label>
-                  <input
-                    type="text"
-                    value={verificationCode}
-                    onChange={(e) => {
-                      setVerificationCode(e.target.value);
-                      setCodeError("");
-                      setFormMessage({
-                        type: "",
-                        text: ""
-                      });
-                    }}
-                    placeholder="Zadejte 6místný kód"
-                    maxLength={6}
-                    inputMode="numeric"
-                  />
-
-                  {codeError && (
-                    <p className="profile-field-error">{codeError}</p>
+                  <label>Aktuální heslo</label>
+                  <div className="password-input-wrapper">
+                    <input
+                      type={showPassword.current ? "text" : "password"}
+                      value={passwordData.currentPassword}
+                      onChange={(e) =>
+                        handlePasswordChange("currentPassword", e.target.value)
+                      }
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      onClick={() => togglePasswordVisibility("current")}
+                    >
+                      {showPassword.current ? <FiEyeOff /> : <FiEye />}
+                    </button>
+                  </div>
+                  {fieldErrors.currentPassword && (
+                    <p className="profile-field-error">{fieldErrors.currentPassword}</p>
                   )}
                 </div>
-              )}
 
-              {formMessage.text && (
-                <div
-                  className={
-                    formMessage.type === "success"
-                      ? "profile-form-message success"
-                      : "profile-form-message error"
-                  }
-                >
-                  {formMessage.text}
+                <div className="profile-form-group">
+                  <label>Nové heslo</label>
+                  <div className="password-input-wrapper">
+                    <input
+                      type={showPassword.new ? "text" : "password"}
+                      value={passwordData.newPassword}
+                      onChange={(e) =>
+                        handlePasswordChange("newPassword", e.target.value)
+                      }
+                      onCopy={preventCopy}
+                      onCut={preventCopy}
+                      autoComplete="new-password"
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      onClick={() => togglePasswordVisibility("new")}
+                    >
+                      {showPassword.new ? <FiEyeOff /> : <FiEye />}
+                    </button>
+                  </div>
+
+                  {fieldErrors.newPassword && (
+                    <p className="profile-field-error">{fieldErrors.newPassword}</p>
+                  )}
+
+                  {passwordData.newPassword && (
+                    <div className="profile-password-strength">
+                      <div className="profile-password-strength-bars">
+                        <span className={`strength-bar ${passwordStrength.score >= 1 ? passwordStrength.className : ""}`}></span>
+                        <span className={`strength-bar ${passwordStrength.score >= 2 ? passwordStrength.className : ""}`}></span>
+                        <span className={`strength-bar ${passwordStrength.score >= 3 ? passwordStrength.className : ""}`}></span>
+                        <span className={`strength-bar ${passwordStrength.score >= 4 ? passwordStrength.className : ""}`}></span>
+                        <span className={`strength-bar ${passwordStrength.score >= 5 ? passwordStrength.className : ""}`}></span>
+                      </div>
+
+                      <span className={`profile-password-strength-label ${passwordStrength.className}`}>
+                        {passwordStrength.label}
+                      </span>
+                    </div>
+                  )}
                 </div>
-              )}
 
-              <button className="btn-primary" type="submit" disabled={isSavingPassword}>
-                {isSavingPassword
-                  ? "Probíhá zpracování..."
-                  : isCodeSent
-                    ? "Potvrdit změnu hesla"
-                    : "Poslat ověřovací kód"}
-              </button>
-            </form>
+                <div className="profile-form-group">
+                  <label>Potvrzení nového hesla</label>
+                  <div className="password-input-wrapper">
+                    <input
+                      type={showPassword.confirm ? "text" : "password"}
+                      value={passwordData.confirmPassword}
+                      onChange={(e) =>
+                        handlePasswordChange("confirmPassword", e.target.value)
+                      }
+                      onPaste={preventPaste}
+                      onDrop={preventPaste}
+                      autoComplete="new-password"
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      onClick={() => togglePasswordVisibility("confirm")}
+                    >
+                      {showPassword.confirm ? <FiEyeOff /> : <FiEye />}
+                    </button>
+                  </div>
 
-          </section>
+                  {fieldErrors.confirmPassword && (
+                    <p className="profile-field-error">{fieldErrors.confirmPassword}</p>
+                  )}
+                </div>
+
+                {isCodeSent && (
+                  <div className="profile-form-group">
+                    <label>Ověřovací kód z e-mailu</label>
+                    <input
+                      type="text"
+                      value={verificationCode}
+                      onChange={(e) => {
+                        setVerificationCode(e.target.value);
+                        setCodeError("");
+                        setFormMessage({ type: "", text: "" });
+                      }}
+                      placeholder="Zadejte 6místný kód"
+                      maxLength={6}
+                      inputMode="numeric"
+                    />
+
+                    {codeError && (
+                      <p className="profile-field-error">{codeError}</p>
+                    )}
+                  </div>
+                )}
+
+                {formMessage.text && (
+                  <div
+                    className={
+                      formMessage.type === "success"
+                        ? "profile-form-message success"
+                        : "profile-form-message error"
+                    }
+                  >
+                    {formMessage.text}
+                  </div>
+                )}
+
+                <button className="btn-primary" type="submit" disabled={isSavingPassword}>
+                  {isSavingPassword
+                    ? "Probíhá zpracování..."
+                    : isCodeSent
+                      ? "Potvrdit změnu hesla"
+                      : "Poslat ověřovací kód"}
+                </button>
+              </form>
+            </section>
+          )}
         </div>
 
         <section className="profile-card">

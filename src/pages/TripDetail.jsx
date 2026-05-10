@@ -7,6 +7,7 @@ import {
   FiArrowLeft,
   FiCalendar,
   FiCheckSquare,
+  FiChevronDown,
   FiEdit2,
   FiFileText,
   FiGlobe,
@@ -15,6 +16,7 @@ import {
 
 import "leaflet/dist/leaflet.css";
 import "../styles/tripdetail.css";
+import "../styles/tripPdf.css";
 import WeatherCard from "../components/trip-detail/WeatherCard";
 
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
@@ -39,7 +41,8 @@ import {
   createNote,
   deleteNote,
   getNotesByTrip,
-  toggleNoteChecklistItem
+  toggleNoteChecklistItem,
+  updateNote
 } from "../api/notes";
 
 import { showError, showSuccess } from "../utils/toast";
@@ -332,6 +335,12 @@ function TripDetail({
   const [newNoteContent, setNewNoteContent] = useState("");
   const [newNoteLabelColor, setNewNoteLabelColor] = useState("default");
   const [newNotePinned, setNewNotePinned] = useState(false);
+  const [editingNoteId, setEditingNoteId] = useState(null);
+  const [editNoteTitle, setEditNoteTitle] = useState("");
+  const [editNoteContent, setEditNoteContent] = useState("");
+  const [editNoteLabelColor, setEditNoteLabelColor] = useState("default");
+  const [editNotePinned, setEditNotePinned] = useState(false);
+  const [isNotesExpanded, setIsNotesExpanded] = useState(false);
 
   useEffect(() => {
     window.scrollTo({
@@ -708,6 +717,47 @@ function TripDetail({
     }
   };
 
+  const handleStartEditNote = (note) => {
+    setEditingNoteId(note._id);
+    setEditNoteTitle(note.title || "");
+    setEditNoteContent(note.content || "");
+    setEditNoteLabelColor(note.labelColor || "default");
+    setEditNotePinned(Boolean(note.isPinned));
+  };
+
+  const handleCancelEditNote = () => {
+    setEditingNoteId(null);
+    setEditNoteTitle("");
+    setEditNoteContent("");
+    setEditNoteLabelColor("default");
+    setEditNotePinned(false);
+  };
+
+  const handleSaveEditedNote = async (noteId) => {
+    if (!editNoteTitle.trim()) {
+      showError("Nadpis poznámky je povinný.");
+      return;
+    }
+
+    try {
+      const updated = await updateNote(noteId, {
+        title: editNoteTitle.trim(),
+        content: editNoteContent.trim(),
+        labelColor: editNoteLabelColor,
+        isPinned: editNotePinned
+      });
+
+      setNotes((prev) =>
+        prev.map((note) => (note._id === noteId ? updated : note))
+      );
+
+      handleCancelEditNote();
+      showSuccess("Poznámka byla upravena.");
+    } catch (err) {
+      showError(err.message || "Nepodařilo se upravit poznámku.");
+    }
+  };
+
   const handleToggleNoteChecklistItem = async (noteId, itemId) => {
     try {
       const updated = await toggleNoteChecklistItem(noteId, itemId);
@@ -732,41 +782,17 @@ function TripDetail({
     const wrapper = document.createElement("div");
 
     wrapper.innerHTML = `
-      <div style="
-        width: 720px;
-        padding: 28px;
-        box-sizing: border-box;
-        font-family: Arial, sans-serif;
-        color: #13203a;
-        background: #ffffff;
-        font-size: 11px;
-        line-height: 1.35;
-      ">
-        <div style="
-          border-bottom: 1px solid #e5ecf6;
-          padding-bottom: 12px;
-          margin-bottom: 18px;
-        ">
-          <h1 style="
-            margin: 0;
-            font-size: 22px;
-            line-height: 1.2;
-            color: #13203a;
-          ">
-            ${title}
-          </h1>
-          <p style="
-            margin: 6px 0 0;
-            color: #6a7891;
-            font-size: 10px;
-          ">
-            Vygenerováno: ${new Date().toLocaleDateString("cs-CZ")}
-          </p>
-        </div>
-
-        ${contentHtml}
+    <div class="trip-pdf">
+      <div class="trip-pdf-header">
+        <h1 class="trip-pdf-title">${title}</h1>
+        <p class="trip-pdf-date">
+          Vygenerováno: ${new Date().toLocaleDateString("cs-CZ")}
+        </p>
       </div>
-    `;
+
+      ${contentHtml}
+    </div>
+  `;
 
     return wrapper;
   };
@@ -774,77 +800,97 @@ function TripDetail({
   const handleExportTripPdf = async () => {
     const checklistItems = packingPackage?.packingItems || [];
 
-    const checklistRows = checklistItems
+    const escapeHtml = (value) =>
+      String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+    const columnCount =
+      checklistItems.length > 24 ? 3 : checklistItems.length > 12 ? 2 : 1;
+
+    const checklistHtml = checklistItems
       .map(
         (item) => `
-          <tr>
-            <td style="border:1px solid #ddd; padding:6px; width:30px;">
-              ${item.checked ? "✓" : ""}
-            </td>
-            <td style="
-              border:1px solid #ddd;
-              padding:6px;
-              ${item.checked ? "text-decoration: line-through; color:#888;" : ""}
-            ">
-              ${item.text}
-            </td>
-          </tr>
-        `
+        <div class="trip-pdf-checklist-item">
+          <span class="trip-pdf-checkbox">
+            ${item.checked ? "✓" : ""}
+          </span>
+
+          <span class="${item.checked ? "trip-pdf-item-checked" : ""}">
+            ${escapeHtml(item.text)}
+          </span>
+        </div>
+      `
       )
       .join("");
 
     const notesHtml = notes
       .map(
         (note) => `
-          <div style="margin-bottom:10px;">
-            <strong>${note.title}</strong><br/>
-            <span style="color:#555;">${note.content || ""}</span>
-          </div>
-        `
+        <div class="trip-pdf-note">
+          <strong class="trip-pdf-note-title">
+            ${escapeHtml(note.title)}
+          </strong>
+
+          <p class="trip-pdf-note-content">
+            ${escapeHtml(note.content || "")}
+          </p>
+        </div>
+      `
       )
       .join("");
 
     const content = `
-      <h2>Přehled výletu</h2>
+    <section class="trip-pdf-section-avoid">
+      <h2 class="trip-pdf-section-title">Přehled výletu</h2>
 
-      <table style="width:100%; border-collapse:collapse; font-size:12px;">
+      <table class="trip-pdf-table">
         ${[
-          ["Název", trip.title],
-          ["Destinace", displayLocation],
-          ["Začátek", formatDate(trip.startDate)],
-          ["Konec", formatDate(trip.endDate)],
-          ["Délka", getTripLengthLabel(tripLength)],
-          ["Kategorie", getCategoryLabel(trip.category)]
-        ]
-          .map(
-            ([l, v]) => `
+        ["Název", trip.title],
+        ["Destinace", displayLocation],
+        ["Začátek", formatDate(trip.startDate)],
+        ["Konec", formatDate(trip.endDate)],
+        ["Délka", getTripLengthLabel(tripLength)],
+        ["Kategorie", getCategoryLabel(trip.category)]
+      ]
+        .map(
+          ([label, value]) => `
               <tr>
-                <td style="border:1px solid #ddd; padding:6px; width:30%; font-weight:bold;">
-                  ${l}
+                <td class="trip-pdf-table-label">
+                  ${escapeHtml(label)}
                 </td>
-                <td style="border:1px solid #ddd; padding:6px;">
-                  ${v}
+                <td>
+                  ${escapeHtml(value)}
                 </td>
               </tr>
             `
-          )
-          .join("")}
+        )
+        .join("")}
       </table>
+    </section>
 
-      <br/>
+    <section class="trip-pdf-section">
+      <h2 class="trip-pdf-section-title">Checklist</h2>
 
-      <h2>Checklist</h2>
+      ${checklistHtml
+        ? `
+            <div class="trip-pdf-checklist trip-pdf-checklist-${columnCount}">
+              ${checklistHtml}
+            </div>
+          `
+        : `<p>Žádné položky</p>`
+      }
+    </section>
 
-      <table style="width:100%; border-collapse:collapse; font-size:12px;">
-        ${checklistRows || "<tr><td>Žádné položky</td></tr>"}
-      </table>
+    <section class="trip-pdf-section trip-pdf-notes">
+      <h2 class="trip-pdf-section-title">Poznámky</h2>
 
-      <br/>
-
-      <h2>Poznámky</h2>
-
-      ${notesHtml || "<p>Žádné poznámky</p>"}
-    `;
+      ${notesHtml || `<p>Žádné poznámky</p>`}
+    </section>
+  `;
 
     const element = createPdfElement(`Detail výletu – ${trip.title}`, content);
 
@@ -856,7 +902,14 @@ function TripDetail({
           scale: 2,
           useCORS: true
         },
-        jsPDF: { unit: "mm", format: "a4" }
+        jsPDF: {
+          unit: "mm",
+          format: "a4",
+          orientation: "portrait"
+        },
+        pagebreak: {
+          mode: ["css", "legacy"]
+        }
       })
       .from(element)
       .save();
@@ -1160,9 +1213,8 @@ function TripDetail({
                   >
                     <button
                       type="button"
-                      className={`trip-check-toggle ${
-                        item.checked ? "checked" : ""
-                      }`}
+                      className={`trip-check-toggle ${item.checked ? "checked" : ""
+                        }`}
                       onClick={() =>
                         handleTogglePackingItem(packingPackage._id, item._id)
                       }
@@ -1350,47 +1402,118 @@ function TripDetail({
                             <h4>{note.title}</h4>
                             <span>
                               Upraveno{" "}
-                              {new Date(note.updatedAt).toLocaleDateString(
-                                "cs-CZ"
-                              )}
+                              {new Date(note.updatedAt).toLocaleDateString("cs-CZ")}
                             </span>
                           </div>
 
-                          <button
-                            type="button"
-                            className="trip-note-delete-btn"
-                            onClick={() => handleDeleteNote(note._id)}
-                          >
-                            ✕
-                          </button>
+                          <div className="trip-note-card-buttons">
+                            <button
+                              type="button"
+                              className="trip-note-edit-btn"
+                              onClick={() => handleStartEditNote(note)}
+                              title="Upravit poznámku"
+                            >
+                              <FiEdit2 />
+                            </button>
+
+                            <button
+                              type="button"
+                              className="trip-note-delete-btn"
+                              onClick={() => handleDeleteNote(note._id)}
+                              title="Smazat poznámku"
+                            >
+                              ✕
+                            </button>
+                          </div>
                         </div>
 
-                        {note.content ? (
-                          <p className="trip-note-card-content">
-                            {note.content}
-                          </p>
-                        ) : null}
+                        {editingNoteId === note._id ? (
+                          <div className="trip-note-edit-form">
+                            <input
+                              type="text"
+                              className="trip-note-input"
+                              value={editNoteTitle}
+                              onChange={(e) => setEditNoteTitle(e.target.value)}
+                              placeholder="Nadpis poznámky"
+                            />
 
-                        {note.checklistItems?.length > 0 && (
-                          <div className="trip-note-card-checklist">
-                            {note.checklistItems.map((item) => (
-                              <button
-                                key={item._id}
-                                type="button"
-                                className={`trip-note-check-item ${
-                                  item.checked ? "checked" : ""
-                                }`}
-                                onClick={() =>
-                                  handleToggleNoteChecklistItem(note._id, item._id)
-                                }
+                            <textarea
+                              className="trip-note-textarea"
+                              value={editNoteContent}
+                              onChange={(e) => setEditNoteContent(e.target.value)}
+                              placeholder="Text poznámky..."
+                              rows={3}
+                            />
+
+                            <div className="trip-note-create-options">
+                              <select
+                                className="trip-note-select"
+                                value={editNoteLabelColor}
+                                onChange={(e) => setEditNoteLabelColor(e.target.value)}
                               >
-                                <span className="trip-note-check-box">
-                                  {item.checked ? "✓" : ""}
-                                </span>
-                                <span>{item.text}</span>
+                                <option value="default">Bez štítku</option>
+                                <option value="blue">Modrá</option>
+                                <option value="green">Zelená</option>
+                                <option value="yellow">Žlutá</option>
+                                <option value="red">Červená</option>
+                                <option value="purple">Fialová</option>
+                              </select>
+
+                              <label className="trip-note-pin-toggle">
+                                <input
+                                  type="checkbox"
+                                  checked={editNotePinned}
+                                  onChange={(e) => setEditNotePinned(e.target.checked)}
+                                />
+                                <span>Připnout</span>
+                              </label>
+                            </div>
+
+                            <div className="trip-note-actions">
+                              <button
+                                type="button"
+                                className="btn-secondary"
+                                onClick={handleCancelEditNote}
+                              >
+                                Zrušit
                               </button>
-                            ))}
+
+                              <button
+                                type="button"
+                                className="btn-primary"
+                                onClick={() => handleSaveEditedNote(note._id)}
+                              >
+                                Uložit změny
+                              </button>
+                            </div>
                           </div>
+                        ) : (
+                          <>
+                            {note.content ? (
+                              <p className="trip-note-card-content">{note.content}</p>
+                            ) : null}
+
+                            {note.checklistItems?.length > 0 && (
+                              <div className="trip-note-card-checklist">
+                                {note.checklistItems.map((item) => (
+                                  <button
+                                    key={item._id}
+                                    type="button"
+                                    className={`trip-note-check-item ${item.checked ? "checked" : ""
+                                      }`}
+                                    onClick={() =>
+                                      handleToggleNoteChecklistItem(note._id, item._id)
+                                    }
+                                  >
+                                    <span className="trip-note-check-box">
+                                      {item.checked ? "✓" : ""}
+                                    </span>
+                                    <span>{item.text}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </>
                         )}
                       </div>
                     ))}
@@ -1399,66 +1522,148 @@ function TripDetail({
 
                 {regularNotes.length > 0 && (
                   <div className="trip-notes-section">
-                    <div className="trip-notes-section-title">
-                      Ostatní poznámky
-                    </div>
+                    <button
+                      type="button"
+                      className="trip-notes-toggle"
+                      onClick={() => setIsNotesExpanded((prev) => !prev)}
+                    >
+                      <span>Ostatní poznámky</span>
 
-                    {regularNotes.map((note) => (
-                      <div
-                        key={note._id}
-                        className={`trip-note-card ${getNoteLabelColorClass(
-                          note.labelColor
-                        )}`}
-                      >
-                        <div className="trip-note-card-head">
-                          <div>
-                            <h4>{note.title}</h4>
-                            <span>
-                              Upraveno{" "}
-                              {new Date(note.updatedAt).toLocaleDateString(
-                                "cs-CZ"
-                              )}
-                            </span>
+                      <FiChevronDown
+                        className={`trip-notes-toggle-icon ${isNotesExpanded ? "open" : ""
+                          }`}
+                      />
+                    </button>
+                    {isNotesExpanded && (
+                      regularNotes.map((note) => (
+                        <div
+                          key={note._id}
+                          className={`trip-note-card ${getNoteLabelColorClass(
+                            note.labelColor
+                          )}`}
+                        >
+                          <div className="trip-note-card-head">
+                            <div>
+                              <h4>{note.title}</h4>
+                              <span>
+                                Upraveno{" "}
+                                {new Date(note.updatedAt).toLocaleDateString("cs-CZ")}
+                              </span>
+                            </div>
+
+                            <div className="trip-note-card-buttons">
+                              <button
+                                type="button"
+                                className="trip-note-edit-btn"
+                                onClick={() => handleStartEditNote(note)}
+                                title="Upravit poznámku"
+                              >
+                                <FiEdit2 />
+                              </button>
+
+                              <button
+                                type="button"
+                                className="trip-note-delete-btn"
+                                onClick={() => handleDeleteNote(note._id)}
+                                title="Smazat poznámku"
+                              >
+                                ✕
+                              </button>
+                            </div>
                           </div>
 
-                          <button
-                            type="button"
-                            className="trip-note-delete-btn"
-                            onClick={() => handleDeleteNote(note._id)}
-                          >
-                            ✕
-                          </button>
+                          {editingNoteId === note._id ? (
+                            <div className="trip-note-edit-form">
+                              <input
+                                type="text"
+                                className="trip-note-input"
+                                value={editNoteTitle}
+                                onChange={(e) => setEditNoteTitle(e.target.value)}
+                                placeholder="Nadpis poznámky"
+                              />
+
+                              <textarea
+                                className="trip-note-textarea"
+                                value={editNoteContent}
+                                onChange={(e) => setEditNoteContent(e.target.value)}
+                                placeholder="Text poznámky..."
+                                rows={3}
+                              />
+
+                              <div className="trip-note-create-options">
+                                <select
+                                  className="trip-note-select"
+                                  value={editNoteLabelColor}
+                                  onChange={(e) => setEditNoteLabelColor(e.target.value)}
+                                >
+                                  <option value="default">Bez štítku</option>
+                                  <option value="blue">Modrá</option>
+                                  <option value="green">Zelená</option>
+                                  <option value="yellow">Žlutá</option>
+                                  <option value="red">Červená</option>
+                                  <option value="purple">Fialová</option>
+                                </select>
+
+                                <label className="trip-note-pin-toggle">
+                                  <input
+                                    type="checkbox"
+                                    checked={editNotePinned}
+                                    onChange={(e) => setEditNotePinned(e.target.checked)}
+                                  />
+                                  <span>Připnout</span>
+                                </label>
+                              </div>
+
+                              <div className="trip-note-actions">
+                                <button
+                                  type="button"
+                                  className="btn-secondary"
+                                  onClick={handleCancelEditNote}
+                                >
+                                  Zrušit
+                                </button>
+
+                                <button
+                                  type="button"
+                                  className="btn-primary"
+                                  onClick={() => handleSaveEditedNote(note._id)}
+                                >
+                                  Uložit změny
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              {note.content ? (
+                                <p className="trip-note-card-content">{note.content}</p>
+                              ) : null}
+
+                              {note.checklistItems?.length > 0 && (
+                                <div className="trip-note-card-checklist">
+                                  {note.checklistItems.map((item) => (
+                                    <button
+                                      key={item._id}
+                                      type="button"
+                                      className={`trip-note-check-item ${item.checked ? "checked" : ""
+                                        }`}
+                                      onClick={() =>
+                                        handleToggleNoteChecklistItem(note._id, item._id)
+                                      }
+                                    >
+                                      <span className="trip-note-check-box">
+                                        {item.checked ? "✓" : ""}
+                                      </span>
+                                      <span>{item.text}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </>
+                          )}
                         </div>
 
-                        {note.content ? (
-                          <p className="trip-note-card-content">
-                            {note.content}
-                          </p>
-                        ) : null}
-
-                        {note.checklistItems?.length > 0 && (
-                          <div className="trip-note-card-checklist">
-                            {note.checklistItems.map((item) => (
-                              <button
-                                key={item._id}
-                                type="button"
-                                className={`trip-note-check-item ${
-                                  item.checked ? "checked" : ""
-                                }`}
-                                onClick={() =>
-                                  handleToggleNoteChecklistItem(note._id, item._id)
-                                }
-                              >
-                                <span className="trip-note-check-box">
-                                  {item.checked ? "✓" : ""}
-                                </span>
-                                <span>{item.text}</span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 )}
               </div>
