@@ -3,6 +3,8 @@
 Frontendová část webové aplikace vytvořené v rámci bakalářské práce.  
 Aplikace slouží k plánování a správě výletů, evidenci navštívených destinací, práci s cestovními balíčky, checklisty, poznámkami, kalendářem, statistikami a uživatelským účtem.
 
+![Vercel](https://img.shields.io/badge/deployed%20on-Vercel-black)
+![React](https://img.shields.io/badge/React-18-blue)
 ---
 
 ## Použité technologie
@@ -169,7 +171,7 @@ Backend zajišťuje:
 
 ## Poznámka k provozu
 
-Backend nasazen na free hostingu, z tohoto důvodu může být při prvním požadavku delší odezva.  
+Backend je nasazen na free hostingu, z tohoto důvodu může být při prvním požadavku delší odezva.
 Důvodem je tzv. „probuzení serveru“ po delší době neaktivity.
 
 ---
