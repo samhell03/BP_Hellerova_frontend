@@ -169,7 +169,7 @@ Backend zajišťuje:
 
 ## Poznámka k provozu
 
-Pokud je backend nasazen na free hostingu, například na Renderu, může být při prvním požadavku delší odezva.  
+Backend nasazen na free hostingu, z tohoto důvodu může být při prvním požadavku delší odezva.  
 Důvodem je tzv. „probuzení serveru“ po delší době neaktivity.
 
 ---
