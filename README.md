@@ -12,7 +12,7 @@ Aplikace slouží k plánování a správě výletů, evidenci navštívených d
 
 Uživatelská dokumentace aplikace, včetně návodů k jednotlivým funkcím, je dostupná zde:
 
-[🔗 https://](https://samhell03.github.io/PDO-dokumentace-final/)
+https://samhell03.github.io/PDO-dokumentace-final/
 
 ---
 
