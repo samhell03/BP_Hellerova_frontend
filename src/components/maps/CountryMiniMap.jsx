@@ -5,7 +5,7 @@ function CountryMiniMap({ lat, lng, label }) {
   if (lat == null || lng == null) {
     return (
       <div className="card">
-        <h3 style={{ marginTop: 0 }}>🗺️ Mapa</h3>
+        <h3 style={{ marginTop: 0 }}> Mapa</h3>
         <p style={{ color: "var(--muted)" }}>Pro tuto zemi nemám souřadnice.</p>
       </div>
     );
@@ -13,7 +13,7 @@ function CountryMiniMap({ lat, lng, label }) {
 
   return (
     <div className="card">
-      <h3 style={{ marginTop: 0 }}>🗺️ Mapa</h3>
+      <h3 style={{ marginTop: 0 }}> Mapa</h3>
 
       <div
         style={{
@@ -29,7 +29,7 @@ function CountryMiniMap({ lat, lng, label }) {
           style={{ height: "100%", width: "100%" }}
           scrollWheelZoom={false}
         >
-          {/* OpenStreetMap tiles – bez API klíče */}
+          {}
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution="&copy; OpenStreetMap contributors"

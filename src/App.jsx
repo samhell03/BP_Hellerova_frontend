@@ -42,7 +42,7 @@ function AppContent() {
   const [authChecked, setAuthChecked] = useState(!storedToken);
   const [isLoggedIn, setIsLoggedIn] = useState(Boolean(storedToken));
   const [userId, setUserId] = useState(storedUserId || null);
-  const [userName, setUserName] = useState(storedUserName || "Cestovateli");
+  const [userName, setUserName] = useState(storedUserName || "cestovateli");
 
   const [myTrips, setMyTrips] = useState([]);
   const [isPlanOpen, setIsPlanOpen] = useState(false);
@@ -80,7 +80,7 @@ function AppContent() {
         setAuthChecked(true);
         setIsLoggedIn(false);
         setUserId(null);
-        setUserName("Cestovateli");
+        setUserName("cestovateli");
         setMyTrips([]);
         return;
       }
@@ -93,7 +93,7 @@ function AppContent() {
         if (!user) {
           setIsLoggedIn(false);
           setUserId(null);
-          setUserName("Cestovateli");
+          setUserName("cestovateli");
           setMyTrips([]);
           clearAuthData();
           return;
@@ -111,7 +111,7 @@ function AppContent() {
 
         setIsLoggedIn(false);
         setUserId(null);
-        setUserName("Cestovateli");
+        setUserName("cestovateli");
         setMyTrips([]);
         clearAuthData();
       } finally {
@@ -137,7 +137,7 @@ function AppContent() {
     clearAuthData();
     setIsLoggedIn(false);
     setUserId(null);
-    setUserName("Cestovateli");
+    setUserName("cestovateli");
     setMyTrips([]);
     setIsPlanOpen(false);
     setEditingTrip(null);
@@ -161,7 +161,7 @@ function AppContent() {
   };
 
   const handleDeleteTrip = async (tripId) => {
-    const confirmed = window.confirm("Opravdu chceš tento výlet smazat?");
+    const confirmed = window.confirm("Opravdu chcete tento výlet smazat?");
 
     if (!confirmed) {
       return;

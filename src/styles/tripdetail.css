@@ -1292,10 +1292,6 @@
   grid-column: 1 / -1;
 }
 
-/* =========================================================
-   TRIP DETAIL – RESPONSIVE FIX
-========================================================= */
-
 @media (max-width: 1100px) {
   .trip-detail-layout {
     grid-template-columns: 1fr;

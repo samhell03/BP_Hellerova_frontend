@@ -212,7 +212,7 @@ function HomePage({ isLoggedIn, userName, myTrips = [], onCreateTrip }) {
                   </>
                 )
               ) : (
-                "Zatím nemáte naplánovaný žádný výlet. Vytvořte si první cestu a začněte si budovat vlastní cestovní přehled."
+                "Zatím nemáte naplánovaný žádný výlet. Vytvořte si první cestu."
               )}
             </p>
 

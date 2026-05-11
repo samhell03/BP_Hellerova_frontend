@@ -224,7 +224,7 @@ function CalendarPage({ isLoggedIn, myTrips = [] }) {
           <div className="calendar-empty-state">
             <h1 className="calendar-title">Kalendář výletů</h1>
             <p className="calendar-muted">
-              Pro zobrazení kalendáře se prosím přihlas.
+              Pro zobrazení kalendáře se prosím přihlaste.
             </p>
           </div>
         </section>
@@ -423,7 +423,7 @@ function CalendarPage({ isLoggedIn, myTrips = [] }) {
 
               {coloredTrips.length === 0 ? (
                 <p className="calendar-muted">
-                  Zatím nemáš žádné výlety, které by šly do kalendáře zobrazit.
+                  Zatím nemáte žádné výlety, které by šly v kalendáři zobrazit.
                 </p>
               ) : (
                 <div
@@ -472,7 +472,7 @@ function CalendarPage({ isLoggedIn, myTrips = [] }) {
 
               {upcomingTrips.length === 0 ? (
                 <p className="calendar-muted">
-                  Momentálně nemáš žádný nadcházející výlet.
+                  Momentálně nemáte žádný nadcházející výlet.
                 </p>
               ) : (
                 <div className="calendar-upcoming-list">

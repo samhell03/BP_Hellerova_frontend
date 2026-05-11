@@ -20,7 +20,7 @@ function getGoogleClientId() {
 function validateRegisterName(userName) {
   const trimmed = userName.trim();
 
-  if (!trimmed) return "Zadej jméno.";
+  if (!trimmed) return "Zadejte jméno.";
   if (trimmed.length < 2) return "Jméno musí mít alespoň 2 znaky.";
   if (trimmed.length > 50) return "Jméno může mít maximálně 50 znaků.";
 
@@ -30,18 +30,18 @@ function validateRegisterName(userName) {
 function validateEmail(email) {
   const trimmed = email.trim();
 
-  if (!trimmed) return "Zadej email.";
+  if (!trimmed) return "Zadejte email.";
   if (trimmed !== email) return "Email nesmí začínat ani končit mezerou.";
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  if (!emailRegex.test(trimmed)) return "Zadej platný email.";
+  if (!emailRegex.test(trimmed)) return "Zadejte platný email.";
 
   return "";
 }
 
 function validatePassword(password) {
-  if (!password) return "Zadej heslo.";
+  if (!password) return "Zadejte heslo.";
   if (password !== password.trim()) return "Heslo nesmí začínat ani končit mezerou.";
   if (password.length < 6) return "Heslo musí mít alespoň 6 znaků.";
 
@@ -276,7 +276,7 @@ function AuthForm({
     nextErrors.password = validatePassword(formData.password);
 
     if (!formData.confirmPassword) {
-      nextErrors.confirmPassword = "Potvrď heslo.";
+      nextErrors.confirmPassword = "Potvrďte heslo.";
     } else if (formData.confirmPassword !== formData.confirmPassword.trim()) {
       nextErrors.confirmPassword = "Heslo nesmí začínat ani končit mezerou.";
     } else if (formData.password !== formData.confirmPassword) {
@@ -312,7 +312,7 @@ function AuthForm({
     nextErrors.email = validateEmail(formData.email);
 
     if (!formData.password) {
-      nextErrors.password = "Zadej heslo.";
+      nextErrors.password = "Zadejte heslo.";
     }
 
     setFieldErrors(nextErrors);
@@ -443,7 +443,7 @@ function AuthForm({
 
         setFormMessage({
           type: "success",
-          text: data.message || "Na váš e-mail byl odeslán ověřovací kód."
+          text: data.message || "Na Váš e-mail byl odeslán ověřovací kód."
         });
 
         showSuccess("Na e-mail byl odeslán ověřovací kód.");
@@ -630,9 +630,9 @@ function AuthForm({
     if (!forgotCode.trim()) {
       setFormMessage({
         type: "error",
-        text: "Zadej ověřovací kód."
+        text: "Zadejte ověřovací kód."
       });
-      showError("Zadej ověřovací kód.");
+      showError("Zadejte ověřovací kód.");
       return;
     }
 
@@ -659,9 +659,9 @@ function AuthForm({
     if (!forgotNewPasswordConfirm) {
       setFormMessage({
         type: "error",
-        text: "Potvrď nové heslo."
+        text: "Potvrďte nové heslo."
       });
-      showError("Potvrď nové heslo.");
+      showError("Potvrďte nové heslo.");
       return;
     }
 
@@ -983,7 +983,7 @@ function AuthForm({
 
         <p className="sidebar-password-hint" style={{ marginBottom: "1rem" }}>
           Na adresu <strong>{pendingVerificationEmail}</strong> jsme poslali
-          ověřovací kód. Zadej ho sem pro dokončení registrace.
+          ověřovací kód. Zadejte ho sem pro dokončení registrace.
         </p>
 
         <div className="sidebar-form-group">
@@ -1017,7 +1017,7 @@ function AuthForm({
         </button>
 
         <div className="sidebar-form-footer">
-          Špatný e-mail nebo se chceš vrátit?
+          Špatný e-mail nebo se chcete vrátit?
           <span
             className="sidebar-form-link"
             onClick={() => {
@@ -1187,7 +1187,7 @@ function AuthForm({
       <button className="btn-primary" type="submit" disabled={isSubmitting}>
         {isSubmitting
           ? isRegistering
-            ? "Vytvářím účet..."
+            ? "Vytváření účtu..."
             : "Probíhá přihlášení..."
           : isRegistering
             ? "Zaregistrovat se"

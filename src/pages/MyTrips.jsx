@@ -154,7 +154,7 @@ function MyTrips({ isLoggedIn, myTrips, onCreateTrip, onEditTrip, onDeleteTrip }
             <div>
               <h1 className="my-trips-title">Moje výlety</h1>
               <p className="my-trips-subtitle">
-                Pro zobrazení svých cest se prosím přihlas.
+                Pro zobrazení svých cest se prosím přihlaste.
               </p>
             </div>
           </div>
@@ -276,9 +276,9 @@ function MyTrips({ isLoggedIn, myTrips, onCreateTrip, onEditTrip, onDeleteTrip }
         ) : totalVisibleTrips === 0 ? (
           <section className="my-trips-section">
             <div className="my-trips-no-results">
-              <div className="my-trips-no-results-icon">🧭</div>
+              <div className="my-trips-no-results-icon"></div>
               <h3>Nebyly nalezeny žádné výlety</h3>
-              <p>Zkus upravit hledání nebo zvolený filtr.</p>
+              <p>Zkuste upravit hledání nebo zvolený filtr.</p>
               <button className="my-trips-reset-button" onClick={resetFilters}>
                 Resetovat filtry
               </button>

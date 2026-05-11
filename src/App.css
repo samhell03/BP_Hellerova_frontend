@@ -21,7 +21,6 @@ body {
   line-height: 1.5;
 }
 
-/* ================= MENU BUTTON ================= */
 .menu-toggle {
   position: fixed;
   top: 20px;
@@ -39,7 +38,6 @@ body {
   justify-content: center;
 }
 
-/* ================= SIDEBAR ================= */
 .sidebar-overlay {
   position: fixed;
   inset: 0;
@@ -85,7 +83,6 @@ body {
   cursor: pointer;
 }
 
-/* ================= LOGIN FORM ================= */
 .login-form {
   display: flex;
   flex-direction: column;
@@ -111,7 +108,6 @@ body {
   font-weight: 600;
 }
 
-/* ================= NAV LINKS ================= */
 .side-nav-links a,
 .nav-item-btn {
   display: block;
@@ -141,7 +137,6 @@ body {
   margin-top: 10px;
 }
 
-/* ================= HEADER ================= */
 .header {
   background: white;
   padding: 90px 0 70px;
@@ -165,7 +160,6 @@ body {
   margin-bottom: 28px;
 }
 
-/* ================= BUTTONS ================= */
 .btn-primary {
   height: 48px;
   padding: 0 18px;
@@ -203,7 +197,6 @@ body {
   transform: translateY(0);
 }
 
-/* ================= CONTENT ================= */
 .content {
   max-width: 1100px;
   margin: 48px auto;
@@ -264,7 +257,6 @@ body {
   padding: 80px 0;
 }
 
-/* ================= MODAL ================= */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -284,7 +276,6 @@ body {
   padding: 30px;
   box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
   position: relative;
-  /* Důležité: overflow visible, aby mohl dropdown 'vylézt' ven */
   overflow: visible;
 }
 
@@ -323,7 +314,6 @@ body {
   gap: 14px;
 }
 
-/* Úprava pro knihovnu CountrySelect */
 .std-input {
   border-radius: 12px !important;
   border: 1px solid var(--border) !important;
@@ -346,7 +336,6 @@ body {
   justify-content: flex-end;
   gap: 12px;
   margin-top: 30px;
-  /* Zajistí, že tlačítka nebudou překryta, pokud seznam zemí nečekaně vyroste */
   position: relative;
   z-index: 1;
 }

@@ -402,7 +402,7 @@ function StatisticsPage({ isLoggedIn, myTrips }) {
               {stats.favouriteCountry}
             </strong>
             <p className="statistics-muted">
-              Stát, který se v tvých výletech objevuje nejčastěji.
+              Stát, který se ve Vašich výletech objevuje nejčastěji.
             </p>
           </article>
 

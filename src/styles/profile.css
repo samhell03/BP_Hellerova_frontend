@@ -6,7 +6,7 @@
   margin: 0 auto;
 }
 
-/* HERO */
+/* hero */
 
 .profile-hero {
   display: flex;
@@ -113,7 +113,7 @@
   color: #6c7a92;
 }
 
-/* INFO */
+/* info */
 
 .profile-info-list {
   display: flex;
@@ -196,7 +196,7 @@
   height: 15px;
 }
 
-/* INLINE NAME FORM */
+/* inline name form */
 
 .profile-inline-name-form {
   display: flex;
@@ -230,7 +230,7 @@
   flex-wrap: wrap;
 }
 
-/* PASSWORD FORM */
+/* passwd form */
 
 .profile-password-form {
   display: flex;
@@ -335,7 +335,7 @@
   font-weight: 600;
 }
 
-/* MESSAGES */
+/* msg */
 
 .profile-form-message {
   margin-top: 2px;
@@ -376,7 +376,7 @@
   line-height: 1.55;
 }
 
-/* STATS */
+/* stats */
 
 .profile-stats {
   display: grid;
@@ -410,7 +410,7 @@
   overflow-wrap: anywhere;
 }
 
-/* BUTTONS */
+/* btns */
 
 .btn-primary {
   height: 42px;
@@ -467,7 +467,6 @@
   transform: none;
 }
 
-/* RESPONSIVE */
 
 @media (max-width: 1100px) {
   .profile-grid {

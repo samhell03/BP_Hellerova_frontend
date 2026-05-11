@@ -60,7 +60,7 @@ export function validateTripForm(trip) {
   const trimmedTitle = trip.title?.trim() || "";
 
   if (!trimmedTitle) {
-    errors.title = "Vyplň název cesty.";
+    errors.title = "Vyplňte název cesty.";
   } else if (trimmedTitle.length < 3) {
     errors.title = "Název cesty musí mít alespoň 3 znaky.";
   } else if (trimmedTitle.length > 60) {
@@ -68,13 +68,13 @@ export function validateTripForm(trip) {
   }
 
   if (!trip.startDate) {
-    errors.startDate = "Vyplň datum odjezdu.";
+    errors.startDate = "Vyplňte datum odjezdu.";
   } else if (isCompleteDateInput(trip.startDate) && !isValidDateValue(trip.startDate)) {
     errors.startDate = "Datum odjezdu není platné.";
   }
 
   if (!trip.endDate) {
-    errors.endDate = "Vyplň datum návratu.";
+    errors.endDate = "Vyplňte datum návratu.";
   } else if (isCompleteDateInput(trip.endDate) && !isValidDateValue(trip.endDate)) {
     errors.endDate = "Datum návratu není platné.";
   }

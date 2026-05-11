@@ -22,8 +22,6 @@ function SidebarNav({ onLogout, closeMenu }) {
         Moje statistiky
       </NavLink>
 
-
-
       <NavLink to="/templates" className={navClass} onClick={closeMenu}>
         Šablony balíčků
       </NavLink>

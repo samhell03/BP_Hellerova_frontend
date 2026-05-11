@@ -259,7 +259,7 @@ function getTimeZoneCardData(weatherPackage, weatherData, tripStartDate) {
   if (!weatherPackage) {
     return {
       value: "—",
-      subvalue: "přidej balíček Počasí"
+      subvalue: "přidejte balíček Počasí"
     };
   }
 
@@ -487,8 +487,8 @@ function TripDetail({
     return (
       <main className="content">
         <div className="card trip-detail-empty-card">
-          <h2>Zamčeno 🔒</h2>
-          <p className="trip-detail-muted">Přihlas se v menu vlevo.</p>
+          <h2>Zamčeno</h2>
+          <p className="trip-detail-muted">Přihlaste se v menu vlevo.</p>
         </div>
       </main>
     );
@@ -500,7 +500,7 @@ function TripDetail({
         <div className="card trip-detail-empty-card">
           <h2>Načítám výlet…</h2>
           <p className="trip-detail-muted">
-            Chvilku strpení, připravuji detail výletu.
+            Chvilku strpení, detail výletu se připravuje.
           </p>
         </div>
       </main>
@@ -660,7 +660,7 @@ function TripDetail({
 
   const handleDeletePackageCard = async (packageId) => {
     const confirmed = window.confirm(
-      "Opravdu chceš tento balíček odstranit z výletu?"
+      "Opravdu chcete tento balíček odstranit z výletu?"
     );
 
     if (!confirmed) return;
@@ -705,7 +705,7 @@ function TripDetail({
   };
 
   const handleDeleteNote = async (noteId) => {
-    const confirmed = window.confirm("Opravdu chceš tuto poznámku smazat?");
+    const confirmed = window.confirm("Opravdu chcete tuto poznámku smazat?");
     if (!confirmed) return;
 
     try {
@@ -1044,7 +1044,7 @@ function TripDetail({
             <p className="trip-detail-muted">Načítám mapu…</p>
           ) : lat == null || lng == null ? (
             <p className="trip-detail-muted">
-              Pro tuto zemi teď nemám dostupné souřadnice.
+              Pro tuto zemi teď nejsou dostupné souřadnice.
             </p>
           ) : (
             <div className="trip-detail-map">
@@ -1173,7 +1173,7 @@ function TripDetail({
           {!packingPackage ? (
             <MissingPackageCard
               title="Balíček Zabalit není přidán"
-              text="Po importu se zde zobrazí checklist věcí, které si chceš sbalit na cestu."
+              text="Po importu se zde zobrazí checklist věcí, které si chcete sbalit na cestu."
               onImport={() => handleImportPackage("packing", "Zabalit")}
             />
           ) : (
@@ -1185,7 +1185,7 @@ function TripDetail({
                 </p>
               ) : (
                 <p className="trip-detail-muted">
-                  Vlastní checklist věcí, které si chceš sbalit.
+                  Vlastní checklist věcí, které si musíte sbalit.
                 </p>
               )}
 
@@ -1291,7 +1291,7 @@ function TripDetail({
             </div>
 
             <p className="trip-detail-muted">
-              Poznamenej si vše, co nechceš před cestou zapomenout.
+              Poznamenejte si vše, co nechcete před cestou zapomenout.
             </p>
 
             <div className="trip-notes-create-wrapper">
@@ -1382,7 +1382,7 @@ function TripDetail({
               </p>
             ) : notes.length === 0 ? (
               <div className="trip-detail-note-placeholder">
-                Zatím tu nejsou žádné poznámky. Přidej si první.
+                Zatím tu nejsou žádné poznámky. Přidejte si první.
               </div>
             ) : (
               <div className="trip-notes-list">

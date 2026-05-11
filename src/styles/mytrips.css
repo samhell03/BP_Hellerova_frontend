@@ -9,7 +9,7 @@
   background: #ffffff;
 }
 
-/* HERO */
+/* hero */
 
 .my-trips-hero {
   display: flex;
@@ -48,7 +48,7 @@
   min-width: 150px;
 }
 
-/* STATISTICS */
+/* statistics */
 
 .my-trips-stats {
   display: grid;
@@ -99,7 +99,7 @@
   font-weight: 800;
 }
 
-/* STATUS DOTS */
+/* status dots */
 
 .stat-dot {
   width: 8px;
@@ -125,7 +125,7 @@
   background: #64748b;
 }
 
-/* TOOLBAR */
+/* toolbar */
 
 .my-trips-toolbar {
   display: flex;
@@ -200,7 +200,7 @@
   color: var(--text);
 }
 
-/* DIVIDER */
+/* divider */
 
 .my-trips-divider {
   height: 1px;
@@ -208,7 +208,7 @@
   pointer-events: none;
 }
 
-/* SECTIONS */
+/* sections*/
 
 .my-trips-section {
   position: relative;
@@ -242,7 +242,7 @@
   border-top: 1px dashed var(--border);
 }
 
-/* LIST */
+/* list */
 
 .my-trips-list {
   display: flex;
@@ -250,7 +250,7 @@
   gap: 16px;
 }
 
-/* TRIP CARD */
+/* trip card */
 
 .my-trips-item {
   position: relative;
@@ -305,7 +305,7 @@
   color: inherit;
 }
 
-/* FLAG */
+/* flag */
 
 .my-trips-item-flag {
   width: 64px;
@@ -332,7 +332,7 @@
   transform: scale(1.05);
 }
 
-/* TEXT */
+/* tetx */
 
 .my-trips-item-content {
   min-width: 0;
@@ -354,7 +354,7 @@
   overflow-wrap: anywhere;
 }
 
-/* STATUS BADGE */
+/* status badge */
 
 .my-trips-status-badge {
   display: inline-flex;
@@ -390,7 +390,7 @@
   color: #64748b;
 }
 
-/* META */
+/* meta */
 
 .my-trips-item-meta {
   margin: 0 0 8px;
@@ -413,7 +413,7 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
-/* STATUS TEXT */
+/* status text */
 
 .my-trips-item-status {
   margin: 0;
@@ -422,7 +422,7 @@
   color: #315caa;
 }
 
-/* ACTIONS */
+/* actions */
 
 .my-trips-item-actions {
   display: flex;
@@ -458,7 +458,7 @@
   border-color: #f3b7b7;
 }
 
-/* EMPTY */
+/* empty */
 
 .my-trips-empty,
 .my-trips-no-results {
@@ -504,7 +504,6 @@
   border-color: #d7e0eb;
 }
 
-/* RESPONSIVE */
 
 @media (max-width: 1200px) {
   .my-trips-toolbar {

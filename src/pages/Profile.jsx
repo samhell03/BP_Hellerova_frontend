@@ -456,7 +456,7 @@ function Profile({ isLoggedIn, myTrips, setUserName }) {
 
       setFormMessage({
         type: "success",
-        text: data.message || "Ověřovací kód byl odeslán na váš e-mail."
+        text: data.message || "Ověřovací kód byl odeslán na Váš e-mail."
       });
     } catch (error) {
       const rawMessage = error.message || "Odeslání ověřovacího kódu se nezdařilo.";
@@ -694,7 +694,7 @@ function Profile({ isLoggedIn, myTrips, setUserName }) {
 
               <div className="profile-info-message">
                 Heslo není spravováno touto aplikací, ale externím poskytovatelem.
-                Změnu hesla je možné provést přímo v nastavení účtu Google.
+                Změnu hesla je nutné provést přímo v nastavení účtu Google.
               </div>
             </section>
           ) : (
@@ -854,7 +854,7 @@ function Profile({ isLoggedIn, myTrips, setUserName }) {
         <section className="profile-card">
           <div className="profile-card-header">
             <h2>Váš cestovatelský přehled</h2>
-            <p>Zde jsou vaše statiky</p>
+            <p>Zde jsou Vaše statiky</p>
           </div>
 
           <div className="profile-stats">

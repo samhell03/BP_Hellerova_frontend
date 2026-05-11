@@ -542,7 +542,7 @@ export default function NewTrip({ onClose, onSave, tripToEdit }) {
     }
 
     if (category === "custom" && !customCategory.trim()) {
-      const message = "Zadej název vlastní kategorie.";
+      const message = "Zadejte název vlastní kategorie.";
       setSubmitError(message);
       showError(message);
       return;
@@ -551,7 +551,7 @@ export default function NewTrip({ onClose, onSave, tripToEdit }) {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      const message = "Uživatel není přihlášen. Zkus se znovu přihlásit.";
+      const message = "Uživatel není přihlášen. Zkuste se znovu přihlásit.";
       setSubmitError(message);
       showError(message);
       return;
@@ -653,7 +653,7 @@ export default function NewTrip({ onClose, onSave, tripToEdit }) {
               {tripToEdit ? "Upravit výlet" : "Naplánovat výlet"}
             </h2>
             <p className="new-trip-subtitle">
-              Vyplň základní informace a vytvoř si svůj cestovatelský plán.
+              Vyplňte základní informace a vytvořte si svůj cestovatelský plán.
             </p>
           </div>
         </div>
@@ -704,7 +704,7 @@ export default function NewTrip({ onClose, onSave, tripToEdit }) {
           ) : (
             <div className="new-trip-helper-row">
               <span className="new-trip-helper-text">
-                Zvol krátký a výstižný název výletu.
+                Zvolte krátký a výstižný název výletu.
               </span>
               <span className="new-trip-counter">{trip.title.length}/60</span>
             </div>
@@ -775,7 +775,7 @@ export default function NewTrip({ onClose, onSave, tripToEdit }) {
           <input
             className={`new-trip-input ${showCountryError ? "input-error" : ""}`}
             type="text"
-            placeholder="Napiš název země nebo kód (např. Itálie / IT)"
+            placeholder="Napište název země nebo kód (např. Itálie / IT)"
             value={countryQuery}
             onChange={(e) => handleCountryInputChange(e.target.value)}
             onFocus={() => {
@@ -847,8 +847,8 @@ export default function NewTrip({ onClose, onSave, tripToEdit }) {
             type="text"
             placeholder={
               trip.countryCode
-                ? "Napiš město v této zemi"
-                : "Nejdřív vyber zemi"
+                ? "Napište město v této zemi"
+                : "Nejdřív vyberte zemi"
             }
             value={cityQuery}
             disabled={!trip.countryCode}
@@ -865,7 +865,7 @@ export default function NewTrip({ onClose, onSave, tripToEdit }) {
 
           {!trip.countryCode ? (
             <span className="new-trip-helper-text">
-              Nejprve vyber zemi.
+              Nejprve vyberte zemi.
             </span>
           ) : trip.city && trip.cityLat != null && trip.cityLng != null ? (
             <div className="new-trip-country-selected">
@@ -883,7 +883,7 @@ export default function NewTrip({ onClose, onSave, tripToEdit }) {
                 <div className="new-trip-country-state">Hledám města…</div>
               ) : cityQuery.trim().length < 2 ? (
                 <div className="new-trip-country-state">
-                  Začni psát název města.
+                  Začněte psát název města.
                 </div>
               ) : cityResults.length === 0 ? (
                 <div className="new-trip-country-state">

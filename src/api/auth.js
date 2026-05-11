@@ -131,7 +131,7 @@ export async function changePassword(payload) {
   const token = sessionStorage.getItem("token");
 
   if (!token) {
-    throw new Error("Nejste přihlášen.");
+    throw new Error("Nejste přihlášen/a.");
   }
 
   const response = await fetch(`${AUTH_API_URL}/change-password`, {
@@ -150,7 +150,7 @@ export async function requestPasswordChangeCode(payload) {
   const token = sessionStorage.getItem("token");
 
   if (!token) {
-    throw new Error("Nejste přihlášen.");
+    throw new Error("Nejste přihlášen/a.");
   }
 
   const response = await fetch(`${AUTH_API_URL}/request-password-change-code`, {
@@ -169,7 +169,7 @@ export async function confirmPasswordChange(code) {
   const token = sessionStorage.getItem("token");
 
   if (!token) {
-    throw new Error("Nejste přihlášen.");
+    throw new Error("Nejste přihlášen/a.");
   }
 
   const response = await fetch(`${AUTH_API_URL}/confirm-password-change`, {
@@ -188,7 +188,7 @@ export async function updateUserName(userName) {
   const token = sessionStorage.getItem("token");
 
   if (!token) {
-    throw new Error("Nejste přihlášen.");
+    throw new Error("Nejste přihlášen/a.");
   }
 
   const response = await fetch(`${AUTH_API_URL}/update-name`, {
